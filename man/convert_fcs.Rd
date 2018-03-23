@@ -21,4 +21,3 @@ convert_fcs(f, asinh.cofactor, transform.data = T, clip.at.zero = T,
 \description{
 Convert a flowFrame to data.frame
 }
-

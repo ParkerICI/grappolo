@@ -34,7 +34,7 @@ cluster_data <- function(tab, col.names, k, algorithm = "", ...) {
     return(tab)
 }
 
-process_files_groups <- function(files, wd, col.names, num_clusters, num_samples, asinh.cofactor, downsample.to, output_type, output.dir) {
+process_files_groups <- function(files, wd, col.names, num.clusters, num.samples, asinh.cofactor, downsample.to, output.type, output.dir) {
     setwd(wd)
     tab <- NULL
     orig.data <- NULL
@@ -66,7 +66,7 @@ process_files_groups <- function(files, wd, col.names, num_clusters, num_samples
         orig.data <- rbind(orig.data, temp.orig.data)
     }
 
-    m <- scfeatures:::cluster_data(tab, col.names, k = num_clusters, sampsize = min(nrow(tab), 1000), samples = num_samples)
+    m <- scfeatures:::cluster_data(tab, col.names, k = num.clusters, sampsize = min(nrow(tab), 1000), samples = num.samples)
     colnames(m) <- gsub("groups", "cellType", colnames(m))
     orig.data <- cbind(orig.data, cellType = m[, "cellType"])
 
@@ -75,20 +75,20 @@ process_files_groups <- function(files, wd, col.names, num_clusters, num_samples
     m <- data.frame(m, check.names = F, stringsAsFactors = F)
     orig.data <- data.frame(orig.data, stringsAsFactors = F, check.names = F)
 
-    write_clustering_output(f, temp, m, output_type, output.dir)
+    write_clustering_output(f, temp, m, output.type, output.dir)
     #my_save(orig.data, paste(f, ".clustered.all_events.orig_data.RData", sep = ""))
 }
 
 
 
-process_file <- function(f, wd, col.names, num_clusters, num_samples, asinh.cofactor, output_type, output.dir) {
+process_file <- function(f, wd, col.names, num.clusters, num.samples, asinh.cofactor, output.type, output.dir) {
     setwd(wd)
 
     fcs.file <- flowCore::read.FCS(f)
     orig.data <- flowCore::exprs(fcs.file)
     tab <- convert_fcs(fcs.file, asinh.cofactor)
 
-    m <- scfeatures:::cluster_data(tab, col.names, k = num_clusters, algorithm = "clara", sampsize = min(nrow(tab), 1000), samples = num_samples)
+    m <- scfeatures:::cluster_data(tab, col.names, k = num.clusters, algorithm = "clara", sampsize = min(nrow(tab), 1000), samples = num.samples)
     colnames(m) <- gsub("groups", "cellType", colnames(m))
     orig.data <- cbind(orig.data, cellType = m[, "cellType"])
 
@@ -101,7 +101,7 @@ process_file <- function(f, wd, col.names, num_clusters, num_samples, asinh.cofa
     m <- data.frame(m, check.names = F, stringsAsFactors = F)
     orig.data <- data.frame(orig.data, stringsAsFactors = FALSE, check.names = FALSE)
 
-    write_clustering_output(f, temp, m, output_type, output.dir)
+    write_clustering_output(f, temp, m, output.type, output.dir)
     #my_save(orig.data, paste(f, ".clustered.all_events.orig_data.RData", sep = ""))
 }
 
@@ -124,32 +124,70 @@ write_clustering_output <- function(base.name, tab.medians, clustered.data, outp
     }
 }
 
-#' @export
-cluster_fcs_files_in_dir <- function(wd, num.cores, col.names, num_clusters, num_samples, asinh.cofactor, output_type = "legacy") {
-    files.list <- list.files(path = wd, pattern = "*.fcs$")
-    output.dir <- NULL
-    if(output_type == "directory")
-        output.dir <- sprintf("%s.clustering_run", gsub(".fcs$", "", files.list[[1]]))
 
-    parallel::mclapply(files.list, mc.cores = num.cores, mc.preschedule = FALSE,
-                       process_file, wd = wd, col.names = col.names, num_clusters = num_clusters,
-                       num_samples = num_samples, asinh.cofactor = asinh.cofactor, output_type = output_type, output.dir = output.dir)
+
+#' Cluster all FCS files contained in a directory
+#'
+#' @param wd The directory containing the FCS files
+#' @inheritDotParams cluster_fcs_files -files.list
+#'
+#' @return Returns the list of files that have been clustered
+#'
+#' @export
+cluster_fcs_files_in_dir <- function(wd, ...) {
+    files.list <- list.files(path = wd, pattern = "*.fcs$")
+    cluster_fcs_files(files.list, ...)
     return(files.list)
 }
 
+#' Cluster FCS files
+#'
+#' @param files.list The files to cluster
+#' @param num.cores Number of CPU cores to use
+#' @param col.names A vector of column names indicating which columns should be used for clustering
+#' @param num.clusters The desired number of clusters
+#' @param asinh.cofactor Cofactor for asinh transformation (see \code{convert_fcs})
+#' @param num.samples Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})
+#'
+#' @return Returns the list of files that have been clustered
+#'
 #' @export
-cluster_fcs_files_groups <- function(wd, files.list, num.cores, col.names, num_clusters, num_samples,
-                                     asinh.cofactor, downsample.to, output_type = "legacy", output_dir = NULL) {
+cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, asinh.cofactor, num.samples = 50, output.type = "legacy") {
+    output.dir <- NULL
+    if(output.type == "directory")
+        output.dir <- sprintf("%s.clustering_run", gsub(".fcs$", "", files.list[[1]]))
 
-    if(output_type == "directory") {
+    parallel::mclapply(files.list, mc.cores = num.cores, mc.preschedule = FALSE,
+                       process_file, wd = wd, col.names = col.names, num.clusters = num.clusters,
+                       num.samples = num.samples, asinh.cofactor = asinh.cofactor, output.type = output.type, output.dir = output.dir)
+    return(files.list)
+}
+
+
+#' Pool FCS files and cluster them
+#'
+#' @inheritParams cluster_fcs_files_in_dir
+#' @param files.list A named list of vectors detailing how the files should be pooled before clustering. Files in the same vector will
+#'   be pooled together. The name of the output is going to correspond to the name of the corresponding list element
+#' @param downsample.to The number of events that should be randomly sampled from each file before pooling. If this is 0, no sampling is performed
+#' @param output.dir The name of the output directory
+#'
+#' @return Resturns the list of files that have been clustered
+#'
+
+#' @export
+cluster_fcs_files_groups <- function(wd, files.list, num.cores, col.names, num.clusters, num.samples,
+                                     asinh.cofactor, downsample.to = 0, output.type = "legacy", output.dir = NULL) {
+
+    if(output.type == "directory") {
         if(is.null(output_dir))
             output_dir <- sprintf("%s.clustering_run", gsub(".fcs$", "", names(files.list)[1]))
         else
             output_dir <- sprintf("%s.clustering_run", output_dir)
     }
     parallel::mclapply(files.list, mc.cores = num.cores, mc.preschedule = FALSE,
-                       process_files_groups, wd = wd, col.names = col.names, num_clusters = num_clusters, num_samples = num_samples,
-                       asinh.cofactor = asinh.cofactor, downsample.to = downsample.to, output_type = output_type, output.dir = output_dir)
+                       process_files_groups, wd = wd, col.names = col.names, num.clusters = num.clusters, num.samples = num.samples,
+                       asinh.cofactor = asinh.cofactor, downsample.to = downsample.to, output.type = output.type, output.dir = output.dir)
 
     return(files.list)
 }

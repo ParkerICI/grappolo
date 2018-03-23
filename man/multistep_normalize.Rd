@@ -50,4 +50,3 @@ To achieve the result described above, you would invoke this function as \code{m
 Note that the function would fail if you only specify a single variable (either \code{condition} or \code{timepoint}), because a single variable is not enough
 to identify a single value for normalization, since you have multiple conditions for each timepoint and viceversa.
 }
-
