@@ -105,7 +105,7 @@ process_file <- function(f, col.names, num.clusters, num.samples, asinh.cofactor
     orig.data <- flowCore::exprs(fcs.file)
     tab <- convert_fcs(fcs.file, asinh.cofactor)
 
-    m <- scfeatures:::cluster_data(tab, col.names, k = num.clusters, algorithm = "clara", sampsize = min(nrow(tab), 1000), samples = num.samples)
+    m <- scfeatures:::cluster_data(tab, col.names, k = num.clusters, sampsize = min(nrow(tab), 1000), samples = num.samples)
     colnames(m) <- gsub("groups", "cellType", colnames(m))
     orig.data <- cbind(orig.data, cellType = m[, "cellType"])
 
@@ -125,7 +125,7 @@ process_file <- function(f, col.names, num.clusters, num.samples, asinh.cofactor
 write_clustering_output <- function(base.name, tab.medians, clustered.data, output.type, output.dir) {
     if(output.type == "legacy") {
         write.table(tab.medians, file.path(output.dir, paste(base.name, ".clustered.txt", sep = "")), row.names = F, sep = "\t", quote = F)
-        my_save(clustered.data, file.path(output.dir, paste(base.name, ".clustered.all_events.RData", sep = "")))
+        saveRDS(clustered.data, file.path(output.dir, paste(base.name, ".clustered.all_events.rds", sep = "")))
     }
     else if(output.type == "directory") {
         clustered.data.dir <- "clustered.data"
@@ -170,7 +170,6 @@ cluster_fcs_files_in_dir <- function(wd, ...) {
 #'
 #' @export
 cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, asinh.cofactor, num.samples = 50, output.type = "legacy", output.dir = ".") {
-    output.dir <- NULL
     if(output.type == "directory")
         output.dir <- sprintf("%s.clustering_run", gsub(".fcs$", "", files.list[[1]]))
 
