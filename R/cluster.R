@@ -1,5 +1,14 @@
 
-
+#' Calcularte sample-level cluster statistics
+#'
+#'
+#' @param tab A \code{data.frame}. Must contain two columns called \code{cellType} and \code{sample}, respectively indicating
+#'   the cluster membership and the sample of origin
+#'
+#' @return Returns a \code{data.frame} with the same columns as \code{tab}, plus sample-level statistics for every column in \code{tab}.
+#'   If \code{tab} contains column \code{foo}, the returned value will contain columns \code{foo@sample1}, \code{foo@sample2} etc., containing the values
+#'   of foo, as calculated only on the rows of \code{tab} that belong to \code{sample1}, \code{sample2} etc.
+#'
 get_stats_by_sample <- function(tab) {
     tab.medians <- plyr::ddply(tab, ~cellType, colwise(median, is.numeric))
     tab.medians.by.sample <- plyr::ddply(tab, ~cellType * sample, plyr::colwise(median, is.numeric))
@@ -25,7 +34,7 @@ get_stats_by_sample <- function(tab) {
 }
 
 
-cluster_data <- function(tab, col.names, k, algorithm = "", ...) {
+cluster_data <- function(tab, col.names, k, ...) {
     m <- as.matrix(tab[, col.names])
 
     groups <- cluster::clara(m, k, ...)$clustering
@@ -34,8 +43,15 @@ cluster_data <- function(tab, col.names, k, algorithm = "", ...) {
     return(tab)
 }
 
-process_files_groups <- function(files, wd, col.names, num.clusters, num.samples, asinh.cofactor, downsample.to, output.type, output.dir) {
-    setwd(wd)
+
+#' Process a group of files for clustering
+#'
+#' @param files A vector of FCS file paths. Data from these files will be pooled and clustered together
+#' @inheritParams cluster_fcs_files_groups
+#' @inheritParams cluster_fcs_files
+#'
+#'
+process_files_groups <- function(files, col.names, num.clusters, num.samples, asinh.cofactor, downsample.to, output.type, output.dir) {
     tab <- NULL
     orig.data <- NULL
 
@@ -79,7 +95,11 @@ process_files_groups <- function(files, wd, col.names, num.clusters, num.samples
     #my_save(orig.data, paste(f, ".clustered.all_events.orig_data.RData", sep = ""))
 }
 
-
+#' Process an individual file for clustering
+#'
+#' @param f The file path
+#' @inheritParams cluster_fcs_files
+#'
 process_file <- function(f, col.names, num.clusters, num.samples, asinh.cofactor, output.type, output.dir) {
     fcs.file <- flowCore::read.FCS(f)
     orig.data <- flowCore::exprs(fcs.file)

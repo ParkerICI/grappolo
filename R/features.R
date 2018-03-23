@@ -115,6 +115,7 @@ multistep_normalize <- function(tab, norm.template, subject.var) {
 
 calculate_cluster_features <- function(tab, metadata.tab, features.names, predictors, endpoint.grouping) {
     m <- reshape_cluster_features(tab, features.names)
+    browser()
 
     df <- reshape::melt(m, varnames = c("file", "variable"))
 
