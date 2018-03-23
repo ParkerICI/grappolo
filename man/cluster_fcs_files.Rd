@@ -5,7 +5,8 @@
 \title{Cluster FCS files}
 \usage{
 cluster_fcs_files(files.list, num.cores, col.names, num.clusters,
-  asinh.cofactor, num.samples = 50, output.type = "legacy")
+  asinh.cofactor, num.samples = 50, output.type = "legacy",
+  output.dir = ".")
 }
 \arguments{
 \item{files.list}{The files to cluster}
@@ -19,6 +20,8 @@ cluster_fcs_files(files.list, num.cores, col.names, num.clusters,
 \item{asinh.cofactor}{Cofactor for asinh transformation (see \code{convert_fcs})}
 
 \item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
+
+\item{output.dir}{Output directory}
 }
 \value{
 Returns the list of files that have been clustered
