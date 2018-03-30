@@ -18,6 +18,15 @@ convert_fcs(f, asinh.cofactor, transform.data = T, clip.at.zero = T,
 
 \item{compensate}{Wether to compensate the data using the compensation matrix embedded in the \code{flowFrame} (if any)}
 }
+\value{
+Returns a \code{data.frame} corresponding to the data in \code{flowCore::exprs(f)} after compensation
+  and transformation
+}
 \description{
-Convert a flowFrame to data.frame
+This function converts a \code{flowFrame} object to an R data.frame, taking care of data
+transformation and compensation.
+}
+\details{
+The column names of the resulting data.frame will be derived from the channel descriptions (i.e. $PxS FCS keyword)
+when possible, and the cannel names otherwise ($PxN)
 }

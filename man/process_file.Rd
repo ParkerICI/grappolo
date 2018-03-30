@@ -18,7 +18,9 @@ process_file(f, col.names, num.clusters, num.samples, asinh.cofactor,
 
 \item{asinh.cofactor}{Cofactor for asinh transformation (see \code{convert_fcs})}
 
-\item{output.dir}{Output directory}
+\item{output.type}{Either \code{"file"} or \code{"directory"}. See, Details}
+
+\item{output.dir}{The directory in which all the output files (and directories) will be created}
 }
 \description{
 Process an individual file for clustering

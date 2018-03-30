@@ -1,4 +1,3 @@
-
 #' Calcularte sample-level cluster statistics
 #'
 #'
@@ -10,7 +9,7 @@
 #'   of foo, as calculated only on the rows of \code{tab} that belong to \code{sample1}, \code{sample2} etc.
 #'
 get_stats_by_sample <- function(tab) {
-    tab.medians <- plyr::ddply(tab, ~cellType, colwise(median, is.numeric))
+    tab.medians <- plyr::ddply(tab, ~cellType, plyr::colwise(median, is.numeric))
     tab.medians.by.sample <- plyr::ddply(tab, ~cellType * sample, plyr::colwise(median, is.numeric))
     pop.size <- plyr::ddply(tab, ~cellType, nrow)
     names(pop.size) <- gsub("V1", "popsize", names(pop.size))
@@ -33,12 +32,22 @@ get_stats_by_sample <- function(tab) {
 
 }
 
-
+#' Clusters a table of data
+#'
+#' This function clusters an input \code{data.frame} using the \code{cluster::clara} function
+#'
+#' @param tab The input \code{data.frame}
+#' @param col.names A vector specifying which columns of \code{tab} should be used for clustering
+#' @param k The desired number of clusters
+#' @param ... Additional arguments to be passed to \code{cluster::clara}
+#'
+#' @return Returns \code{tab}, with an added column called \code{groups}, indicating cluster membership
+#'
 cluster_data <- function(tab, col.names, k, ...) {
     m <- as.matrix(tab[, col.names])
-
     groups <- cluster::clara(m, k, ...)$clustering
-    print("Clustering done")
+    message("Clustering done")
+    flush.console()
     tab <- cbind(tab, groups)
     return(tab)
 }
@@ -91,7 +100,7 @@ process_files_groups <- function(files, col.names, num.clusters, num.samples, as
     m <- data.frame(m, check.names = F, stringsAsFactors = F)
     orig.data <- data.frame(orig.data, stringsAsFactors = F, check.names = F)
 
-    write_clustering_output(f, temp, m, output.type, output.dir)
+    write_clustering_output(files[1], temp, m, output.type, output.dir)
     #my_save(orig.data, paste(f, ".clustered.all_events.orig_data.RData", sep = ""))
 }
 
@@ -119,26 +128,48 @@ process_file <- function(f, col.names, num.clusters, num.samples, asinh.cofactor
     orig.data <- data.frame(orig.data, stringsAsFactors = FALSE, check.names = FALSE)
 
     write_clustering_output(f, temp, m, output.type, output.dir)
-    #my_save(orig.data, paste(f, ".clustered.all_events.orig_data.RData", sep = ""))
 }
 
-write_clustering_output <- function(base.name, tab.medians, clustered.data, output.type, output.dir) {
-    if(output.type == "legacy") {
+
+
+#' Write clustering output
+#'
+#' @param base.name The base name for naming output files
+#' @param tab.medians A \code{data.frame} containing median values for each cluster
+#' @param clustered.data A \code{data.frame} containing the original data, with an exta column called \code{cellType} indicating
+#'   clustering membership
+#' @param output.type The type of output desired, see \code{cluster_fcs_files}
+#' @param output.dir The output directory
+write_clustering_output <- function(base.name, tab.medians, clustered.data, output.type = c("file", "directory"), output.dir) {
+    if(output.type == "file") {
         write.table(tab.medians, file.path(output.dir, paste(base.name, ".clustered.txt", sep = "")), row.names = F, sep = "\t", quote = F)
         saveRDS(clustered.data, file.path(output.dir, paste(base.name, ".clustered.all_events.rds", sep = "")))
     }
     else if(output.type == "directory") {
-        clustered.data.dir <- "clustered.data"
         txt.file.name <- paste(base.name, ".clustered.txt", sep = "")
-        full.path <- file.path(output.dir, clustered.data.dir, txt.file.name)
-        dir.create(full.path, recursive = T)
+        cluster.data.dir <- file.path(output.dir, "cluster_data")
 
+        if(!is.null(clustered.data$sample)) {
+            sapply(unique(clustered.data$sample), function(x) {dir.create(file.path(cluster.data.dir, x), recursive = T)})
+            dir.create(file.path(cluster.data.dir, "pooled"), recursive = T)
+        }
         write.table(tab.medians, file.path(output.dir, txt.file.name, sep = ""),
                     row.names = F, sep = "\t", quote = F)
-        plyr::ddply(clustered.data, ~cellType, function(x) {
-            saveRDS(x, file = file.path(full.path, sprintf("cluster_%d.RData", x$cellType[1])))
+        plyr::d_ply(clustered.data, ~cellType, function(x) {
+            if(is.null(x$sample))
+                saveRDS(x, file = file.path(cluster.data.dir, base.name, sprintf("cluster_%d.rds", x$cellType[1])))
+            else {
+                saveRDS(x, file = file.path(cluster.data.dir, "pooled", sprintf("cluster_%d.rds", x$cellType[1])))
+
+                plyr::d_ply(x, ~sample, function(df) {
+                    saveRDS(df, file = file.path(cluster.data.dir, df$sample[1], sprintf("cluster_%d.rds", df$cellType[1])))
+                })
+
+
+            }
         })
     }
+    return(invisible(NULL))
 }
 
 
@@ -159,48 +190,54 @@ cluster_fcs_files_in_dir <- function(wd, ...) {
 
 #' Cluster FCS files
 #'
+#' Cluster individual FCS files, using multiple CPU cores if possible
+#'
+#' This function can produce two types of output:
+#'  \itemize{
+#'    \item{\code{"file"}}: {Two files will be written, with names derived by appending \code{".clustered.txt"} and
+#'      \code{".all_events.rds"} to the file names in \code{files.list}. The \code{".clustered.txt"} file is a tab-separated
+#'      table of median values for each cluster. The \code{".all_events.rds"} file is an RDS file (readable with \code{base::readRDS})
+#'      containing a \code{data.frame} with all the rows in the original input file and an additional column called
+#'      \code{cellType}, indicating cluster membership.
+#'    }
+#'    \item{\code{"directory"}}: {In addition to the \code{".clustered.txt"} file described above, this mode will create a folder
+#'      called \code{"cluster_data"}. This folder will contain a sub-folder for each input file, containing separate RDS files
+#'      with the data in each cluster
+#'    }
+#'  }
+#'
 #' @param files.list The files to cluster
 #' @param num.cores Number of CPU cores to use
 #' @param col.names A vector of column names indicating which columns should be used for clustering
 #' @param num.clusters The desired number of clusters
 #' @param asinh.cofactor Cofactor for asinh transformation (see \code{convert_fcs})
 #' @param num.samples Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})
-#' @param output.dir Output directory
+#' @param output.type Either \code{"file"} or \code{"directory"}. See, Details
+#' @param output.dir The directory in which all the output files (and directories) will be created
 #' @return Returns the list of files that have been clustered
-#'
 #' @export
-cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, asinh.cofactor, num.samples = 50, output.type = "legacy", output.dir = ".") {
-    if(output.type == "directory")
-        output.dir <- sprintf("%s.clustering_run", gsub(".fcs$", "", files.list[[1]]))
-
+cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, asinh.cofactor, num.samples = 50, output.type = "file", output.dir = ".") {
     parallel::mclapply(files.list, mc.cores = num.cores, mc.preschedule = FALSE,
                        process_file, col.names = col.names, num.clusters = num.clusters,
                        num.samples = num.samples, asinh.cofactor = asinh.cofactor, output.type = output.type, output.dir = output.dir)
     return(files.list)
 }
 
+#FIXME! The description of files.list is incorrect with respect to names
 
 #' Pool FCS files and cluster them
 #'
 #' @inheritParams cluster_fcs_files_in_dir
 #' @param files.list A named list of vectors detailing how the files should be pooled before clustering. Files in the same vector will
-#'   be pooled together. The name of the output is going to correspond to the name of the corresponding list element
+#'   be pooled together. The name of the output is going to correspond to the name of the corresponding list element.
 #' @param downsample.to The number of events that should be randomly sampled from each file before pooling. If this is 0, no sampling is performed
 #' @param output.dir The name of the output directory
 #'
 #' @return Resturns the list of files that have been clustered
 #'
-
 #' @export
 cluster_fcs_files_groups <- function(wd, files.list, num.cores, col.names, num.clusters, num.samples,
-                                     asinh.cofactor, downsample.to = 0, output.type = "legacy", output.dir = NULL) {
-
-    if(output.type == "directory") {
-        if(is.null(output_dir))
-            output_dir <- sprintf("%s.clustering_run", gsub(".fcs$", "", names(files.list)[1]))
-        else
-            output_dir <- sprintf("%s.clustering_run", output_dir)
-    }
+                                     asinh.cofactor, downsample.to = 0, output.type = "file", output.dir = ".") {
     parallel::mclapply(files.list, mc.cores = num.cores, mc.preschedule = FALSE,
                        process_files_groups, wd = wd, col.names = col.names, num.clusters = num.clusters, num.samples = num.samples,
                        asinh.cofactor = asinh.cofactor, downsample.to = downsample.to, output.type = output.type, output.dir = output.dir)

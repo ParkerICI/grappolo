@@ -5,7 +5,7 @@
 \title{Cluster FCS files}
 \usage{
 cluster_fcs_files(files.list, num.cores, col.names, num.clusters,
-  asinh.cofactor, num.samples = 50, output.type = "legacy",
+  asinh.cofactor, num.samples = 50, output.type = "file",
   output.dir = ".")
 }
 \arguments{
@@ -21,11 +21,28 @@ cluster_fcs_files(files.list, num.cores, col.names, num.clusters,
 
 \item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
 
-\item{output.dir}{Output directory}
+\item{output.type}{Either \code{"file"} or \code{"directory"}. See, Details}
+
+\item{output.dir}{The directory in which all the output files (and directories) will be created}
 }
 \value{
 Returns the list of files that have been clustered
 }
 \description{
-Cluster FCS files
+Cluster individual FCS files, using multiple CPU cores if possible
+}
+\details{
+This function can produce two types of output:
+ \itemize{
+   \item{\code{"file"}}: {Two files will be written, with names derived by appending \code{".clustered.txt"} and
+     \code{".all_events.rds"} to the file names in \code{files.list}. The \code{".clustered.txt"} file is a tab-separated
+     table of median values for each cluster. The \code{".all_events.rds"} file is an RDS file (readable with \code{base::readRDS})
+     containing a \code{data.frame} with all the rows in the original input file and an additional column called
+     \code{cellType}, indicating cluster membership.
+   }
+   \item{\code{"directory"}}: {In addition to the \code{".clustered.txt"} file described above, this mode will create a folder
+     called \code{"cluster_data"}. This folder will contain a sub-folder for each input file, containing separate RDS files
+     with the data in each cluster
+   }
+ }
 }

@@ -20,6 +20,8 @@ process_files_groups(files, col.names, num.clusters, num.samples,
 
 \item{downsample.to}{The number of events that should be randomly sampled from each file before pooling. If this is 0, no sampling is performed}
 
+\item{output.type}{Either \code{"file"} or \code{"directory"}. See, Details}
+
 \item{output.dir}{The name of the output directory}
 }
 \description{
