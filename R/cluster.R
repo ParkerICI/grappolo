@@ -52,7 +52,7 @@ cluster_data <- function(tab, col.names, k, ...) {
     message("Clustering done")
     flush.console()
 
-    tab <- cbind(tab, groups, check.names = F, stringsAsFactors = F)
+    tab <- data.frame(tab, groups, check.names = F, stringsAsFactors = F)
     return(tab)
 }
 
