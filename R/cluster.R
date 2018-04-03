@@ -164,7 +164,7 @@ write_clustering_output <- function(base.name, tab.medians, clustered.data, outp
             sapply(unique(clustered.data$sample), function(x) {dir.create(file.path(cluster.data.dir, x), recursive = T)})
             dir.create(file.path(cluster.data.dir, "pooled"), recursive = T)
         }
-        write.table(tab.medians, file.path(output.dir, txt.file.name, sep = ""),
+        write.table(tab.medians, file.path(output.dir, txt.file.name),
                     row.names = F, sep = "\t", quote = F)
         plyr::d_ply(clustered.data, ~cellType, function(x) {
             if(is.null(x$sample))
