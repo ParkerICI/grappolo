@@ -4,13 +4,11 @@
 \alias{cluster_fcs_files_groups}
 \title{Pool FCS files and cluster them}
 \usage{
-cluster_fcs_files_groups(wd, files.list, num.cores, col.names, num.clusters,
+cluster_fcs_files_groups(files.list, num.cores, col.names, num.clusters,
   num.samples, asinh.cofactor, downsample.to = 0, output.type = "file",
   output.dir = ".")
 }
 \arguments{
-\item{wd}{The directory containing the FCS files}
-
 \item{files.list}{A named list of vectors detailing how the files should be pooled before clustering. Files in the same vector will
 be pooled together. The name of the output is going to correspond to the name of the corresponding list element.}
 

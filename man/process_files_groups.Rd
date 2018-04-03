@@ -8,7 +8,8 @@ process_files_groups(files, col.names, num.clusters, num.samples,
   asinh.cofactor, downsample.to, output.type, output.dir)
 }
 \arguments{
-\item{files}{A vector of FCS file paths. Data from these files will be pooled and clustered together}
+\item{files}{A vector of strings. The first string in the vector corresponds to the name to be used for the clustering output,
+the remaining strings are the paths of the files that will be pooled together for clustering}
 
 \item{col.names}{A vector of column names indicating which columns should be used for clustering}
 

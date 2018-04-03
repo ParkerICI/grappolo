@@ -1,4 +1,4 @@
-#' Calcularte sample-level cluster statistics
+#' Calculate sample-level cluster statistics
 #'
 #'
 #' @param tab A \code{data.frame}. Must contain two columns called \code{cellType} and \code{sample}, respectively indicating
@@ -45,17 +45,22 @@ get_stats_by_sample <- function(tab) {
 #'
 cluster_data <- function(tab, col.names, k, ...) {
     m <- as.matrix(tab[, col.names])
+
+    message("Clustering started")
+    flush.console()
     groups <- cluster::clara(m, k, ...)$clustering
     message("Clustering done")
     flush.console()
-    tab <- cbind(tab, groups)
+
+    tab <- cbind(tab, groups, check.names = F, stringsAsFactors = F)
     return(tab)
 }
 
 
 #' Process a group of files for clustering
 #'
-#' @param files A vector of FCS file paths. Data from these files will be pooled and clustered together
+#' @param files A vector of strings. The first string in the vector corresponds to the name to be used for the clustering output,
+#'   the remaining strings are the paths of the files that will be pooled together for clustering
 #' @inheritParams cluster_fcs_files_groups
 #' @inheritParams cluster_fcs_files
 #'
@@ -63,6 +68,12 @@ cluster_data <- function(tab, col.names, k, ...) {
 process_files_groups <- function(files, col.names, num.clusters, num.samples, asinh.cofactor, downsample.to, output.type, output.dir) {
     tab <- NULL
     orig.data <- NULL
+
+    out.name <- files[1]
+    files <- files[2:length(files)]
+
+    message("Loading data")
+    flush.console()
 
     for(f in files) {
         fcs.file <- flowCore::read.FCS(f)
@@ -100,7 +111,7 @@ process_files_groups <- function(files, col.names, num.clusters, num.samples, as
     m <- data.frame(m, check.names = F, stringsAsFactors = F)
     orig.data <- data.frame(orig.data, stringsAsFactors = F, check.names = F)
 
-    write_clustering_output(files[1], temp, m, output.type, output.dir)
+    write_clustering_output(out.name, temp, m, output.type, output.dir)
     #my_save(orig.data, paste(f, ".clustered.all_events.orig_data.RData", sep = ""))
 }
 
@@ -223,7 +234,6 @@ cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, as
     return(files.list)
 }
 
-#FIXME! The description of files.list is incorrect with respect to names
 
 #' Pool FCS files and cluster them
 #'
@@ -236,10 +246,15 @@ cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, as
 #' @return Resturns the list of files that have been clustered
 #'
 #' @export
-cluster_fcs_files_groups <- function(wd, files.list, num.cores, col.names, num.clusters, num.samples,
+cluster_fcs_files_groups <- function(files.list, num.cores, col.names, num.clusters, num.samples,
                                      asinh.cofactor, downsample.to = 0, output.type = "file", output.dir = ".") {
+
+    files.list <- lapply(names(files.list), function(x) {
+        c(x, files.list[[x]])
+    })
+
     parallel::mclapply(files.list, mc.cores = num.cores, mc.preschedule = FALSE,
-                       process_files_groups, wd = wd, col.names = col.names, num.clusters = num.clusters, num.samples = num.samples,
+                       process_files_groups, col.names = col.names, num.clusters = num.clusters, num.samples = num.samples,
                        asinh.cofactor = asinh.cofactor, downsample.to = downsample.to, output.type = output.type, output.dir = output.dir)
 
     return(files.list)

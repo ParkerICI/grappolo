@@ -2,7 +2,7 @@
 % Please edit documentation in R/cluster.R
 \name{get_stats_by_sample}
 \alias{get_stats_by_sample}
-\title{Calcularte sample-level cluster statistics}
+\title{Calculate sample-level cluster statistics}
 \usage{
 get_stats_by_sample(tab)
 }
@@ -16,5 +16,5 @@ Returns a \code{data.frame} with the same columns as \code{tab}, plus sample-lev
   of foo, as calculated only on the rows of \code{tab} that belong to \code{sample1}, \code{sample2} etc.
 }
 \description{
-Calcularte sample-level cluster statistics
+Calculate sample-level cluster statistics
 }
