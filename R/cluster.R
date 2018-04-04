@@ -76,6 +76,9 @@ process_files_groups <- function(files, col.names, num.clusters, num.samples, as
     flush.console()
 
     for(f in files) {
+        message(sprintf("Loading %s", f))
+        flush.console()
+
         fcs.file <- flowCore::read.FCS(f)
         temp.orig.data <- flowCore::exprs(fcs.file)
         temp.tab <- convert_fcs(fcs.file, asinh.cofactor)
