@@ -115,7 +115,7 @@ process_files_groups <- function(files, col.names, num.clusters, num.samples, as
     orig.data <- data.frame(orig.data, stringsAsFactors = F, check.names = F)
 
     write_clustering_output(out.name, temp, m, output.type, output.dir)
-    #my_save(orig.data, paste(f, ".clustered.all_events.orig_data.RData", sep = ""))
+    return(invisible(NULL))
 }
 
 #' Process an individual file for clustering
@@ -142,6 +142,7 @@ process_file <- function(f, col.names, num.clusters, num.samples, asinh.cofactor
     orig.data <- data.frame(orig.data, stringsAsFactors = FALSE, check.names = FALSE)
 
     write_clustering_output(f, temp, m, output.type, output.dir)
+    return(invisible(NULL))
 }
 
 
@@ -228,13 +229,12 @@ cluster_fcs_files_in_dir <- function(wd, ...) {
 #' @param num.samples Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})
 #' @param output.type Either \code{"file"} or \code{"directory"}. See, Details
 #' @param output.dir The directory in which all the output files (and directories) will be created
-#' @return Returns the list of files that have been clustered
+#' @return Returns either \code{NULL} or a \code{try-error} object if some error occurred during the computation
 #' @export
 cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, asinh.cofactor, num.samples = 50, output.type = "file", output.dir = ".") {
     parallel::mclapply(files.list, mc.cores = num.cores, mc.preschedule = FALSE,
                        process_file, col.names = col.names, num.clusters = num.clusters,
                        num.samples = num.samples, asinh.cofactor = asinh.cofactor, output.type = output.type, output.dir = output.dir)
-    return(files.list)
 }
 
 
@@ -246,10 +246,10 @@ cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, as
 #' @param downsample.to The number of events that should be randomly sampled from each file before pooling. If this is 0, no sampling is performed
 #' @param output.dir The name of the output directory
 #'
-#' @return Resturns the list of files that have been clustered
+#' @return Returns either \code{NULL} or a \code{try-error} object if some error occurred during the computation
 #'
 #' @export
-cluster_fcs_files_groups <- function(files.list, num.cores, col.names, num.clusters, num.samples,
+cluster_fcs_files_groups <- function(files.list, num.cores, col.names, num.clusters, num.samples = 50,
                                      asinh.cofactor, downsample.to = 0, output.type = "file", output.dir = ".") {
 
     files.list <- lapply(names(files.list), function(x) {
@@ -260,7 +260,6 @@ cluster_fcs_files_groups <- function(files.list, num.cores, col.names, num.clust
                        process_files_groups, col.names = col.names, num.clusters = num.clusters, num.samples = num.samples,
                        asinh.cofactor = asinh.cofactor, downsample.to = downsample.to, output.type = output.type, output.dir = output.dir)
 
-    return(files.list)
 }
 
 

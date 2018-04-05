@@ -26,7 +26,7 @@ cluster_fcs_files(files.list, num.cores, col.names, num.clusters,
 \item{output.dir}{The directory in which all the output files (and directories) will be created}
 }
 \value{
-Returns the list of files that have been clustered
+Returns either \code{NULL} or a \code{try-error} object if some error occurred during the computation
 }
 \description{
 Cluster individual FCS files, using multiple CPU cores if possible

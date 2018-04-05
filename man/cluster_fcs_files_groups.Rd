@@ -5,8 +5,8 @@
 \title{Pool FCS files and cluster them}
 \usage{
 cluster_fcs_files_groups(files.list, num.cores, col.names, num.clusters,
-  num.samples, asinh.cofactor, downsample.to = 0, output.type = "file",
-  output.dir = ".")
+  num.samples = 50, asinh.cofactor, downsample.to = 0,
+  output.type = "file", output.dir = ".")
 }
 \arguments{
 \item{files.list}{A named list of vectors detailing how the files should be pooled before clustering. Files in the same vector will
@@ -17,7 +17,7 @@ be pooled together. The name of the output is going to correspond to the name of
 \item{output.dir}{The name of the output directory}
 }
 \value{
-Resturns the list of files that have been clustered
+Returns either \code{NULL} or a \code{try-error} object if some error occurred during the computation
 }
 \description{
 Pool FCS files and cluster them
