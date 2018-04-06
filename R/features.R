@@ -113,7 +113,7 @@ multistep_normalize <- function(tab, norm.template, subject.var) {
 #'   of the levels of the \code{predictors} for each feature specified in \code{features.names}
 #' @export
 
-calculate_cluster_features <- function(tab, metadata.tab, features.names, predictors, endpoint.grouping) {
+get_cluster_features <- function(tab, metadata.tab, features.names, predictors, endpoint.grouping) {
     m <- reshape_cluster_features(tab, features.names)
     browser()
 
@@ -137,7 +137,7 @@ run_test <- function() {
     tab <- read.table("C:/Users/fgherardini/temp/standalone_citrus/data/Patient20_diseased_unstim.fcs.clustered.txt", header = T, sep = "\t", check.names = F, stringsAsFactors = F)
     metadata.tab <- read.table("C:/Users/fgherardini/temp/standalone_citrus/data/test_metadata.txt", header = T, sep = "\t", check.names = F, stringsAsFactors = F)
 
-    df <- scfeatures:::calculate_cluster_features(tab, metadata.tab, c("FunctionalMarker1", "FunctionalMarker2", "popsize"),
+    df <- scfeatures:::get_cluster_features(tab, metadata.tab, c("FunctionalMarker1", "FunctionalMarker2", "popsize"),
                                                   predictors = c("condition"), endpoint.grouping = c("day", "sample"))
 
 }
