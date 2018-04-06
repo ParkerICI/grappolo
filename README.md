@@ -37,7 +37,7 @@ cluster_fcs_files_in_dir("foo", num.cores = 1, col.names = col.names, num.cluste
 # You can also specify a list of files directly using the cluster_fcs_files function,
 # which takes essentially the same arguments
 files.list <- c("foo/A.fcs", "foo/B,fcs")
-cluster_fcs_files("foo", num.cores = 1, col.names = col.names, num.clusters = 200,
+cluster_fcs_files(files.list, num.cores = 1, col.names = col.names, num.clusters = 200,
     asinh.cofactor = 5, output.type = "directory")
 ```
 
@@ -54,6 +54,46 @@ files.groups <- list(
 cluster_fcs_files_groups(files.groups, num.cores = 1, col.names = col.names, 
     num.clusters = 200, asinh.cofactor = 5, output.type = "directory")
 ```
+
+## Output
+
+Both clustering functions ouptut two types of data:
+- A summary table of per-cluster statistics
+- One or more RDS (R binary format) files containing cluster memberships for every cell event
+
+The details of the RDS output depend on the `output.type` option, please refer to the R documentation for more details. The summary table contains one row for each cluster, and one column for each channel in the original FCS files, with the table entries representing the median intensity of the channel in the corresponding cluster.
+
+If multiple files have been pooled together this table also contains columns in the form `Marker1@A.fcs`, which contain the median expression of `Marker1`, calculated only on the cells in that cluster that came from sample `A.fcs`
+
+### Features generation
+
+This package also contains functions to rearrange the clustering output to calculate cluster features that can be used to build a predictive model (similar to the approach used in the Citrus package). These functions operate on the clusters summary table described above, and require data to have been pooled together before clustering (i.e. the clustering should have been run with the `cluster_fcs_files_groups` function). In other words, if you want to build a model that includes data from the four files in the example above, you need to cluster them as a single group.
+
+The general approach for features generation for model building, is that you want to generate a table where each row represents a cluster feature (e.g. the abundance of a cluster, or the expression of a marker in a cluster), and each column represent an observation (e.g. a different sample), for which you have a categorical or continuous endpoint of interest that you want to predict using the cluster features.
+
+This package allows you to gather data that is scattered through multiple FCS files and, after clustering, integrate all the different pieces together to generate that matrix. Suppose that you have the following experimental design
+
+|File   |timepoint  |condition  |sample     |label  |tumor_size |
+|-------|-----------|-----------|-----------|-------|-----------|
+|A.fcs  |baseline   |stim1      |subject1   |R      |0.1        |
+|B.fcs  |baseline   |stim2      |subject1   |R      |0.1        |
+|C.fcs  |baseline   |unstim     |subject1   |R      |0.1        |
+|D.fcs  |week8      |stim1      |subject1   |R      |1.5        |
+|E.fcs  |week8      |stim2      |subject1   |R      |1.5        |
+|F.fcs  |week8      |unstim     |subject1   |R      |1.5        |
+|G.fcs  |baseline   |stim1      |subject2   |NR     |0.2        |
+|H.fcs  |baseline   |stim2      |subject2   |NR     |0.2        |
+|I.fcs  |baseline   |unstim     |subject2   |NR     |0.2        |
+|L.fcs  |week8      |stim1      |subject2   |NR     |3.2        |
+|M.fcs  |week8      |stim2      |subject2   |NR     |3.2        |
+|N.fcs  |week8      |unstim     |subjcet2   |NR     |3.2        |
+
+
+
+
+
+
+
 
 
 
