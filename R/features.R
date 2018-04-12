@@ -105,29 +105,43 @@ multistep_normalize <- function(tab, norm.template, subject.var) {
 #' @param metadata.tab A \code{data.frame} containing sample metadata (see Details)
 #' @param features.names The name of the features in \code{tab} that are to be included in the output. These names correspond to the portion before the \code{@}
 #'   in \code{names(tab)}
-#' @param predictors Columns in \code{metadata.tab} that identify predictors
-#' @param endpoint.grouping Columns in \code{metadata.tab} that identify the grouping of the response variable (see Details). The combination of \code{predictors}
-#'   and \code{endpoint.grouping} must uniquely identify every row in \code{metadata.tab}. The function will throw an error if this is not the case.
+#' @param out.format The format of the return value, see below for detail
+#' @param predictors Only used if \code{out.format == "tidy"}. Columns in \code{metadata.tab} that identify predictors.
+#' @param endpoint.grouping Only used if \code{out.format == "tidy"}. Columns in \code{metadata.tab} that identify the grouping of the response variable
+#'   (see Details). The combination of \code{predictors} and \code{endpoint.grouping} must uniquely identify every row in \code{metadata.tab}.
+#'   The function will throw an error if this is not the case.
 #'
-#' @return Returns a data frame containing the same columns specified in \code{endpoint.grouping}, plus all the cluster features, which are essentially combinations
-#'   of the levels of the \code{predictors} for each feature specified in \code{features.names}
+#' @return Returns a data frame whose format depends on the value of the \code{format} parameter
+#'   \itemize{
+#'     \item{table}: each row corresponds to a combination of the levels of the variables specified in \code{endpoint.grouping}, and the columns are
+#'     cluster features, which are combinations of the levels of the \code{predictors} for each feature specified in \code{features.names}
+#'     \item{tidy}: there is a single numeric column, and all the other columns represent variables whose combinations uniquely identify each observation (i.e. each row)
+#'   }
 #' @export
 
-get_cluster_features <- function(tab, metadata.tab, features.names, predictors, endpoint.grouping) {
+get_cluster_features <- function(tab, metadata.tab, features.names, out.format = "table", predictors = NULL, endpoint.grouping = NULL) {
+    out.format <- match.arg(out.format, c("table", "tidy"))
     m <- reshape_cluster_features(tab, features.names)
-    browser()
 
     df <- reshape::melt(m, varnames = c("file", "variable"))
 
     df <- merge(df, metadata.tab, by = "file")
+    ret <- NULL
 
-    formula.exp <- as.formula(sprintf("%s ~ %s", paste(endpoint.grouping, collapse = "+"),
-                                      paste(c("variable", predictors), collapse = "+")))
+    if(out.format == "tidy")
+        ret <- df
+    else {
+        if(is.null(predictors) || is.null(endpoint.grouping))
+            stop("You must specifiy predictors and endpoint.grouping when out.format == 'table'")
 
-    #Stop if the combination of response grouping and predictors does not uniquely identify each file
-    if(nrow(df) != nrow(unique(df[, c("variable", predictors, endpoint.grouping)])))
-        stop("The combination of predictors and endpoint.grouping does not uniquely identify every row in metadata.tab")
-    ret <- reshape::cast(df, formula.exp)
+        formula.exp <- as.formula(sprintf("%s ~ %s", paste(endpoint.grouping, collapse = "+"),
+                                          paste(c("variable", predictors), collapse = "+")))
+
+        #Stop if the combination of response grouping and predictors does not uniquely identify each file
+        if(nrow(df) != nrow(unique(df[, c("variable", predictors, endpoint.grouping)])))
+            stop("The combination of predictors and endpoint.grouping does not uniquely identify every row in metadata.tab")
+        ret <- reshape::cast(df, formula.exp)
+    }
 
     return(ret)
 }
