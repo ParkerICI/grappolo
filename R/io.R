@@ -93,7 +93,7 @@ remove_empty_fcs_files <- function(files.list, events.threshold = 0) {
         fcs <- tryCatch(
                 flowCore::read.FCS(f),
                 error = function(e) {
-                    message(sprintf("Error reading %s"), f)
+                    message(sprintf("Error reading %s", f))
                     return(NULL)
                 }
             )
