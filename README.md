@@ -1,7 +1,33 @@
+**--> WARNING: This package is in Beta and under active development. Things may break or change without notice. Use it at your own risk and makre sure you have a backup copy of your data <--**
+
+Please use github issues to report bugs and for feature requests
+
+
+
+## Installation
+
+1. install the `flowCore` package
+```R
+source("http://bioconductor.org/biocLite.R")
+biocLite("flowCore")
+```
+
+2. make sure `devtools` is installed on your system.
+
+```R
+install.packages("devtools")
+```
+
+3. install `scfeatures` with the following command
+
+```R
+devtools::install_github("ParkerICI/scfeatures")
+```
+
 ## Usage
 This is an R package for clustering single-cell flow cytometry data and generate features to be used in mode building.
 
-The following snippets provide an example usage, documentations for all functions can be accessed directly in R
+The following snippets provide an example usage, documentation for all functions can be accessed directly in R.
 
 ### Clustering
 
@@ -121,7 +147,9 @@ In this case the feature matrix would have the following format:
 - columns: subject, timepoint, so 2 * 3 columns
 
 
+---
 
+Copyright 2018. Parker Institute for Cancer Immunotherapy
 
 
 
