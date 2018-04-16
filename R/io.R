@@ -90,8 +90,14 @@ get_common_columns <- function(files.list, file.type = c("txt", "fcs")) {
 #' @export
 remove_empty_files <- function(files.list, events.threshold = 0) {
     for(f in files.list) {
-        fcs <- flowCore::read.FCS(f)
-        if(dim(fcs)["events"] <= events.threshold) {
+        fcs <- tryCatch(
+                flowCore::read.FCS(f),
+                error = function(e) {
+                    message(sprintf("Error reading %s"), f)
+                    return(NULL)
+                }
+            )
+        if(!is.null(fcs) && (dim(fcs)["events"] <= events.threshold)) {
             message(sprintf("Removing %s", f))
             file.remove(f)
 
