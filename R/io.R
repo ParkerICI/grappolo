@@ -79,7 +79,7 @@ get_common_columns <- function(files.list, file.type = c("txt", "fcs")) {
     return(Reduce(intersect, l))
 }
 
-#' Remove empty files
+#' Remove empty FCS files
 #'
 #' This is an utility function to remove empty FCS files, which can cause problems with downstream analysis
 #'
@@ -88,7 +88,7 @@ get_common_columns <- function(files.list, file.type = c("txt", "fcs")) {
 #' @param events.threshold A number. FCS files with number of events \code{<=} than this threshold will be removed
 #'
 #' @export
-remove_empty_files <- function(files.list, events.threshold = 0) {
+remove_empty_fcs_files <- function(files.list, events.threshold = 0) {
     for(f in files.list) {
         fcs <- tryCatch(
                 flowCore::read.FCS(f),
