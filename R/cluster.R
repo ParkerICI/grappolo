@@ -225,7 +225,7 @@ cluster_fcs_files_in_dir <- function(wd, ...) {
 #' @param num.cores Number of CPU cores to use
 #' @param col.names A vector of column names indicating which columns should be used for clustering
 #' @param num.clusters The desired number of clusters
-#' @param asinh.cofactor Cofactor for asinh transformation (see \code{convert_fcs})
+#' @param asinh.cofactor Cofactor for asinh transformation. If this is \code{NULL} no transformation is performed (see \code{convert_fcs})
 #' @param num.samples Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})
 #' @param output.type Either \code{"file"} or \code{"directory"}. See, Details
 #' @param output.dir The directory in which all the output files (and directories) will be created

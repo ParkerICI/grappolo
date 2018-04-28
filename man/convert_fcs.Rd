@@ -4,15 +4,12 @@
 \alias{convert_fcs}
 \title{Convert a flowFrame to data.frame}
 \usage{
-convert_fcs(f, asinh.cofactor, transform.data = T, clip.at.zero = T,
-  compensate = T)
+convert_fcs(f, asinh.cofactor = NULL, clip.at.zero = T, compensate = T)
 }
 \arguments{
 \item{f}{The \code{flowFrame} to convert}
 
-\item{asinh.cofactor}{Cofactor for \code{asinh} transformation}
-
-\item{transform.data}{Whether to apply \code{asinh} transformation to the data}
+\item{asinh.cofactor}{Cofactor for \code{asinh} transformation. If this is \code{NULL} no transformation is performed}
 
 \item{clip.at.zero}{Wether to clip negative values (after transformation) at zero}
 

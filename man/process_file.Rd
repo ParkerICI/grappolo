@@ -16,7 +16,7 @@ process_file(f, col.names, num.clusters, num.samples, asinh.cofactor,
 
 \item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
 
-\item{asinh.cofactor}{Cofactor for asinh transformation (see \code{convert_fcs})}
+\item{asinh.cofactor}{Cofactor for asinh transformation. If this is \code{NULL} no transformation is performed (see \code{convert_fcs})}
 
 \item{output.type}{Either \code{"file"} or \code{"directory"}. See, Details}
 

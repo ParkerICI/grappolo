@@ -17,7 +17,7 @@ the remaining strings are the paths of the files that will be pooled together fo
 
 \item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
 
-\item{asinh.cofactor}{Cofactor for asinh transformation (see \code{convert_fcs})}
+\item{asinh.cofactor}{Cofactor for asinh transformation. If this is \code{NULL} no transformation is performed (see \code{convert_fcs})}
 
 \item{downsample.to}{The number of events that should be randomly sampled from each file before pooling. If this is 0, no sampling is performed}
 

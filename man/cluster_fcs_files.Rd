@@ -17,7 +17,7 @@ cluster_fcs_files(files.list, num.cores, col.names, num.clusters,
 
 \item{num.clusters}{The desired number of clusters}
 
-\item{asinh.cofactor}{Cofactor for asinh transformation (see \code{convert_fcs})}
+\item{asinh.cofactor}{Cofactor for asinh transformation. If this is \code{NULL} no transformation is performed (see \code{convert_fcs})}
 
 \item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
 

@@ -7,8 +7,7 @@
 #' when possible, and the cannel names otherwise ($PxN)
 #'
 #' @param f The \code{flowFrame} to convert
-#' @param asinh.cofactor Cofactor for \code{asinh} transformation
-#' @param transform.data Whether to apply \code{asinh} transformation to the data
+#' @param asinh.cofactor Cofactor for \code{asinh} transformation. If this is \code{NULL} no transformation is performed
 #' @param clip.at.zero Wether to clip negative values (after transformation) at zero
 #' @param compensate Wether to compensate the data using the compensation matrix embedded in the \code{flowFrame} (if any)
 #'
@@ -16,7 +15,7 @@
 #'   and transformation
 #'
 #' @export
-convert_fcs <- function(f, asinh.cofactor, transform.data = T, clip.at.zero = T, compensate = T) {
+convert_fcs <- function(f, asinh.cofactor = NULL, clip.at.zero = T, compensate = T) {
     comp <- grep("SPILL", names(flowCore::description(f)), value = T)
 
     if(compensate && (length(comp) > 0)) {
@@ -33,7 +32,7 @@ convert_fcs <- function(f, asinh.cofactor, transform.data = T, clip.at.zero = T,
     }
     tab <- flowCore::exprs(f)
     m <- as.matrix(tab)
-    if(transform.data)
+    if(!is.null(asinh.cofactor))
         m <- asinh(m / asinh.cofactor)
 
     if(clip.at.zero)
@@ -70,7 +69,7 @@ get_common_columns <- function(files.list, file.type = c("txt", "fcs")) {
             temp <- read.table(f, header = T, sep = "\t", check.names = F, quote = "", nrows = 1)
         else if(file.type == "fcs") {
             fcs <- flowCore::read.FCS(f, which.lines = 1)
-            temp <- convert_fcs(fcs, asinh.cofactor = 1, transform.data = F, compensate = F)
+            temp <- convert_fcs(fcs, compensate = F)
         }
 
         l <- c(l, list(names(temp)))
