@@ -4,20 +4,21 @@
 \alias{write_clustering_output}
 \title{Write clustering output}
 \usage{
-write_clustering_output(base.name, tab.medians, clustered.data,
-  output.type = c("file", "directory"), output.dir)
+write_clustering_output(tab.medians, base.name, clustered.data, ...)
 }
 \arguments{
-\item{base.name}{The base name for naming output files}
-
 \item{tab.medians}{A \code{data.frame} containing median values for each cluster}
+
+\item{base.name}{The base name for naming output files}
 
 \item{clustered.data}{A \code{data.frame} containing the original data, with an exta column called \code{cellType} indicating
 clustering membership}
 
-\item{output.type}{The type of output desired, see \code{cluster_fcs_files}}
-
-\item{output.dir}{The output directory}
+\item{...}{Arguments passed on to \code{write_clusters_data}
+\describe{
+  \item{output.type}{The type of output desired, see \code{cluster_fcs_files}}
+  \item{output.dir}{The output directory}
+}}
 }
 \description{
 Write clustering output

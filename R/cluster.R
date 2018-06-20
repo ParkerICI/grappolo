@@ -114,7 +114,7 @@ process_files_groups <- function(files, col.names, num.clusters, num.samples, as
     m <- data.frame(m, check.names = F, stringsAsFactors = F)
     orig.data <- data.frame(orig.data, stringsAsFactors = F, check.names = F)
 
-    write_clustering_output(out.name, temp, m, output.type, output.dir)
+    write_clustering_output(temp, out.name, m, output.type, output.dir)
     return(invisible(NULL))
 }
 
@@ -141,40 +141,39 @@ process_file <- function(f, col.names, num.clusters, num.samples, asinh.cofactor
     m <- data.frame(m, check.names = F, stringsAsFactors = F)
     orig.data <- data.frame(orig.data, stringsAsFactors = FALSE, check.names = FALSE)
 
-    write_clustering_output(f, temp, m, output.type, output.dir)
+    write_clustering_output(temp, f, m, output.type, output.dir)
     return(invisible(NULL))
 }
 
-
-
 #' Write clustering output
 #'
-#' @param base.name The base name for naming output files
-#' @param tab.medians A \code{data.frame} containing median values for each cluster
-#' @param clustered.data A \code{data.frame} containing the original data, with an exta column called \code{cellType} indicating
-#'   clustering membership
+#' @param clustered.data A \code{data.frame} containing the clustered data. Each row corresponds to cell. The \code{data.frame}
+#'   must include a column called \code{cellType}, indicating cluster membership
+#' @param base.name The base name for naming output files. This is only used if \code{clustered_data} does not contain
+#'   a column called \code{sample}. Otherwise the \code{sample} names are used for this purpose
 #' @param output.type The type of output desired, see \code{cluster_fcs_files}
 #' @param output.dir The output directory
-write_clustering_output <- function(base.name, tab.medians, clustered.data, output.type = c("file", "directory"), output.dir) {
+#'
+#' @export
+write_clusters_data <- function(clustered.data, base.name, output.type = c("file", "directory"), output.dir = "./") {
     if(output.type == "file") {
-        write.table(tab.medians, file.path(output.dir, paste(base.name, ".clustered.txt", sep = "")), row.names = F, sep = "\t", quote = F)
         saveRDS(clustered.data, file.path(output.dir, paste(base.name, ".clustered.all_events.rds", sep = "")))
     }
     else if(output.type == "directory") {
-        txt.file.name <- paste(base.name, ".clustered.txt", sep = "")
-        cluster.data.dir <- file.path(output.dir, "cluster_data")
+        cluster.data.dir <- file.path(output.dir, "clusters_data")
 
         if(!is.null(clustered.data$sample)) {
-            sapply(unique(clustered.data$sample), function(x) {dir.create(file.path(cluster.data.dir, x), recursive = T)})
-            dir.create(file.path(cluster.data.dir, "pooled"), recursive = T)
+            sapply(unique(clustered.data$sample), function(x) {dir.create(file.path(cluster.data.dir, x), recursive = TRUE, showWarnings = FALSE)})
+            dir.create(file.path(cluster.data.dir, "pooled"), recursive = TRUE, showWarnings = FALSE)
+        } else {
+            dir.create(file.path(cluster.data.dir, base.name), recursive = TRUE, showWarnings = FALSE)
         }
-        write.table(tab.medians, file.path(output.dir, txt.file.name),
-                    row.names = F, sep = "\t", quote = F)
+
         plyr::d_ply(clustered.data, ~cellType, function(x) {
             if(is.null(x$sample))
-                saveRDS(x, file = file.path(cluster.data.dir, base.name, sprintf("cluster_%d.rds", x$cellType[1])))
+                saveRDS(x, file = file.path(cluster.data.dir, base.name, sprintf("c%d.rds", x$cellType[1])))
             else {
-                saveRDS(x, file = file.path(cluster.data.dir, "pooled", sprintf("cluster_%d.rds", x$cellType[1])))
+                saveRDS(x, file = file.path(cluster.data.dir, "pooled", sprintf("c%d.rds", x$cellType[1])))
 
                 plyr::d_ply(x, ~sample, function(df) {
                     saveRDS(df, file = file.path(cluster.data.dir, df$sample[1], sprintf("cluster_%d.rds", df$cellType[1])))
@@ -184,6 +183,23 @@ write_clustering_output <- function(base.name, tab.medians, clustered.data, outp
             }
         })
     }
+    return(invisible(NULL))
+}
+
+
+#' Write clustering output
+#'
+#' @param tab.medians A \code{data.frame} containing median values for each cluster
+#' @param base.name The base name for naming output files
+#' @param clustered.data A \code{data.frame} containing the original data, with an exta column called \code{cellType} indicating
+#'   clustering membership
+#' @inheritDotParams write_clusters_data -clustered.data -base.name
+#'
+#'
+write_clustering_output <- function(tab.medians, base.name, clustered.data, ...) {
+    write.table(tab.medians, file.path(output.dir, paste(base.name, ".clustered.txt", sep = "")), row.names = F, sep = "\t", quote = F)
+    write_clusters_data(clustered.data, base.name, ...)
+
     return(invisible(NULL))
 }
 
@@ -216,7 +232,7 @@ cluster_fcs_files_in_dir <- function(wd, ...) {
 #'      \code{cellType}, indicating cluster membership.
 #'    }
 #'    \item{\code{"directory"}}: {In addition to the \code{".clustered.txt"} file described above, this mode will create a folder
-#'      called \code{"cluster_data"}. This folder will contain a sub-folder for each input file, containing separate RDS files
+#'      called \code{"clusters_data"}. This folder will contain a sub-folder for each input file, containing separate RDS files
 #'      with the data in each cluster
 #'    }
 #'  }

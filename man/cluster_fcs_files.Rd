@@ -41,7 +41,7 @@ This function can produce two types of output:
      \code{cellType}, indicating cluster membership.
    }
    \item{\code{"directory"}}: {In addition to the \code{".clustered.txt"} file described above, this mode will create a folder
-     called \code{"cluster_data"}. This folder will contain a sub-folder for each input file, containing separate RDS files
+     called \code{"clusters_data"}. This folder will contain a sub-folder for each input file, containing separate RDS files
      with the data in each cluster
    }
  }
