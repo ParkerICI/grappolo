@@ -5,7 +5,7 @@
 \title{Process an individual file for clustering}
 \usage{
 process_file(f, col.names, num.clusters, num.samples, asinh.cofactor,
-  output.type, output.dir)
+  output.dir)
 }
 \arguments{
 \item{f}{The file path}
@@ -17,8 +17,6 @@ process_file(f, col.names, num.clusters, num.samples, asinh.cofactor,
 \item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
 
 \item{asinh.cofactor}{Cofactor for asinh transformation. If this is \code{NULL} no transformation is performed (see \code{convert_fcs})}
-
-\item{output.type}{Either \code{"file"} or \code{"directory"}. See, Details}
 
 \item{output.dir}{The directory in which all the output files (and directories) will be created}
 }

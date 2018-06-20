@@ -5,7 +5,7 @@
 \title{Process a group of files for clustering}
 \usage{
 process_files_groups(files, col.names, num.clusters, num.samples,
-  asinh.cofactor, downsample.to, output.type, output.dir)
+  asinh.cofactor, downsample.to, output.dir)
 }
 \arguments{
 \item{files}{A vector of strings. The first string in the vector corresponds to the name to be used for the clustering output,
@@ -20,8 +20,6 @@ the remaining strings are the paths of the files that will be pooled together fo
 \item{asinh.cofactor}{Cofactor for asinh transformation. If this is \code{NULL} no transformation is performed (see \code{convert_fcs})}
 
 \item{downsample.to}{The number of events that should be randomly sampled from each file before pooling. If this is 0, no sampling is performed}
-
-\item{output.type}{Either \code{"file"} or \code{"directory"}. See, Details}
 
 \item{output.dir}{The name of the output directory}
 }

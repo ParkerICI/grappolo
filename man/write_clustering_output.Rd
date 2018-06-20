@@ -4,7 +4,7 @@
 \alias{write_clustering_output}
 \title{Write clustering output}
 \usage{
-write_clustering_output(tab.medians, base.name, clustered.data, ...)
+write_clustering_output(tab.medians, base.name, clustered.data, output.dir)
 }
 \arguments{
 \item{tab.medians}{A \code{data.frame} containing median values for each cluster}
@@ -13,12 +13,6 @@ write_clustering_output(tab.medians, base.name, clustered.data, ...)
 
 \item{clustered.data}{A \code{data.frame} containing the original data, with an exta column called \code{cellType} indicating
 clustering membership}
-
-\item{...}{Arguments passed on to \code{write_clusters_data}
-\describe{
-  \item{output.type}{The type of output desired, see \code{cluster_fcs_files}}
-  \item{output.dir}{The output directory}
-}}
 }
 \description{
 Write clustering output
