@@ -3,6 +3,7 @@
 export(cluster_fcs_files)
 export(cluster_fcs_files_groups)
 export(cluster_fcs_files_in_dir)
+export(clustering_GUI)
 export(convert_fcs)
 export(get_cluster_features)
 export(get_common_columns)

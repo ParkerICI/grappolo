@@ -5,11 +5,21 @@
 \title{Pool FCS files and cluster them}
 \usage{
 cluster_fcs_files_groups(files.list, num.cores, col.names, num.clusters,
-  num.samples = 50, asinh.cofactor, downsample.to = 0, output.dir = ".")
+  asinh.cofactor, num.samples = 50, downsample.to = 0, output.dir = ".")
 }
 \arguments{
 \item{files.list}{A named list of vectors detailing how the files should be pooled before clustering. Files in the same vector will
 be pooled together. The name of the output is going to correspond to the name of the corresponding list element.}
+
+\item{num.cores}{Number of CPU cores to use}
+
+\item{col.names}{A vector of column names indicating which columns should be used for clustering}
+
+\item{num.clusters}{The desired number of clusters}
+
+\item{asinh.cofactor}{Cofactor for asinh transformation. If this is \code{NULL} no transformation is performed (see \code{convert_fcs})}
+
+\item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
 
 \item{downsample.to}{The number of events that should be randomly sampled from each file before pooling. If this is 0, no sampling is performed}
 

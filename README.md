@@ -58,13 +58,13 @@ col.names <- c("Marker1", "Marker2", "Marker3")
 # and for a description of the output type. The output is saved on disk, and the function
 # simply return the list of files that have been clustered
 cluster_fcs_files_in_dir("foo", num.cores = 1, col.names = col.names, num.clusters = 200,
-    asinh.cofactor = 5, output.type = "directory")
+    asinh.cofactor = 5)
 
 # You can also specify a list of files directly using the cluster_fcs_files function,
 # which takes essentially the same arguments
 files.list <- c("foo/A.fcs", "foo/B,fcs")
 cluster_fcs_files(files.list, num.cores = 1, col.names = col.names, num.clusters = 200,
-    asinh.cofactor = 5, output.type = "directory")
+    asinh.cofactor = 5)
 ```
 
 If instead you wanted to pool some files together, you would setup the run as follows

@@ -99,8 +99,8 @@ process_files_groups <- function(files, col.names, num.clusters, num.samples, as
 
         temp.tab <- as.data.frame(temp.tab, check.names = F, stringsAsFactors = F)
 
-        temp.tab <- data.frame(temp.tab, sample = f, check.names = F, stringsAsFactors = F)
-        temp.orig.data <- data.frame(temp.orig.data, sample = f, check.names = F, stringsAsFactors = F)
+        temp.tab <- data.frame(temp.tab, sample = basename(f), check.names = F, stringsAsFactors = F)
+        temp.orig.data <- data.frame(temp.orig.data, sample = basename(f), check.names = F, stringsAsFactors = F)
         tab <- rbind(tab, temp.tab)
         orig.data <- rbind(orig.data, temp.orig.data)
     }
@@ -141,7 +141,7 @@ process_file <- function(f, col.names, num.clusters, num.samples, asinh.cofactor
     m <- data.frame(m, check.names = F, stringsAsFactors = F)
     orig.data <- data.frame(orig.data, stringsAsFactors = FALSE, check.names = FALSE)
 
-    write_clustering_output(temp, f, m, output.dir)
+    write_clustering_output(temp, basename(f), m, output.dir)
     return(invisible(NULL))
 }
 
@@ -172,7 +172,7 @@ write_clustering_output <- function(tab.medians, base.name, clustered.data, outp
 #'
 #' @export
 cluster_fcs_files_in_dir <- function(wd, ...) {
-    files.list <- list.files(path = wd, pattern = "*.fcs$", full.names = T)
+    files.list <- list.files(path = wd, pattern = "*.fcs$", full.names = TRUE, ignore.case = TRUE)
     cluster_fcs_files(files.list, ...)
     return(files.list)
 }
@@ -218,12 +218,13 @@ cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, as
 #'   be pooled together. The name of the output is going to correspond to the name of the corresponding list element.
 #' @param downsample.to The number of events that should be randomly sampled from each file before pooling. If this is 0, no sampling is performed
 #' @param output.dir The name of the output directory
+#' @inheritParams cluster_fcs_files
 #'
 #' @return Returns either \code{NULL} or a \code{try-error} object if some error occurred during the computation
 #'
 #' @export
-cluster_fcs_files_groups <- function(files.list, num.cores, col.names, num.clusters, num.samples = 50,
-                                     asinh.cofactor, downsample.to = 0, output.dir = ".") {
+cluster_fcs_files_groups <- function(files.list, num.cores, col.names, num.clusters, asinh.cofactor,
+                                        num.samples = 50, downsample.to = 0, output.dir = ".") {
 
     files.list <- lapply(names(files.list), function(x) {
         c(x, files.list[[x]])
