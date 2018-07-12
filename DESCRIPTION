@@ -1,4 +1,4 @@
-Package: scfeatures
+Package: grappolo
 Type: Package
 Title: Feature generation from single-cell data
 Version: 0.3.0

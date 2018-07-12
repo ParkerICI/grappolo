@@ -62,7 +62,7 @@ shinyServer(function(input, output, session) {
     
     observe({
         if(!is.null(input$clusteringui_file_for_markers) && grepl("*.fcs$", input$clusteringui_file_for_markers)) {
-            v <- scfeatures:::get_fcs_col_names(file.path(working.directory, input$clusteringui_file_for_markers))
+            v <- grappolo:::get_fcs_col_names(file.path(working.directory, input$clusteringui_file_for_markers))
             updateSelectInput(session, "clusteringui_markers", choices = v)
         }
     })
@@ -99,7 +99,7 @@ shinyServer(function(input, output, session) {
             
             if(input$clusteringui_clustering_mode == "Pooled") {
                 input.files <- lapply(clusteringui_reactive_values$clustering_groups, function(s) {file.path(working.directory, s)})
-                scfeatures::cluster_fcs_files_groups(input.files, 
+                grappolo::cluster_fcs_files_groups(input.files, 
                     num.cores = input$clusteringui_num_cores, 
                     col.names = input$clusteringui_markers,
                     num.clusters = input$clusteringui_num_clusters, 
@@ -109,7 +109,7 @@ shinyServer(function(input, output, session) {
                     output.dir = working.directory
                 )
             } else {
-                scfeatures::cluster_fcs_files_in_dir(working.directory,
+                grappolo::cluster_fcs_files_in_dir(working.directory,
                     num.cores = input$clusteringui_num_cores, 
                     col.names = input$clusteringui_markers,
                     num.clusters = input$clusteringui_num_clusters, 

@@ -151,7 +151,7 @@ run_test <- function() {
     tab <- read.table("C:/Users/fgherardini/temp/standalone_citrus/data/Patient20_diseased_unstim.fcs.clustered.txt", header = T, sep = "\t", check.names = F, stringsAsFactors = F)
     metadata.tab <- read.table("C:/Users/fgherardini/temp/standalone_citrus/data/test_metadata.txt", header = T, sep = "\t", check.names = F, stringsAsFactors = F)
 
-    df <- scfeatures:::get_cluster_features(tab, metadata.tab, c("FunctionalMarker1", "FunctionalMarker2", "popsize"),
+    df <- grappolo:::get_cluster_features(tab, metadata.tab, c("FunctionalMarker1", "FunctionalMarker2", "popsize"),
                                                   predictors = c("condition"), endpoint.grouping = c("day", "sample"))
 
 }

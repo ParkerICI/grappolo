@@ -1,5 +1,5 @@
 shinyUI(
-    navbarPage("scfeatures",
+    navbarPage("grappolo",
         tabPanel("Cluster data",
             uiOutput("clusteringUI")
         )

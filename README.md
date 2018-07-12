@@ -18,10 +18,10 @@ biocLite("flowCore")
 install.packages("devtools")
 ```
 
-3. install `scfeatures` with the following command
+3. install `grappolo` with the following command
 
 ```R
-devtools::install_github("ParkerICI/scfeatures")
+devtools::install_github("ParkerICI/grappolo")
 ```
 
 ## Usage
