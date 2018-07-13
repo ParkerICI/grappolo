@@ -87,7 +87,7 @@ Both clustering functions ouptut two types of data:
 - A summary table of per-cluster statistics
 - One or more RDS (R binary format) files containing cluster memberships for every cell event
 
-The details of the RDS output depend on the `output.type` option, please refer to the R documentation for more details. The summary table contains one row for each cluster, and one column for each channel in the original FCS files, with the table entries representing the median intensity of the channel in the corresponding cluster.
+The summary table contains one row for each cluster, and one column for each channel in the original FCS files, with the table entries representing the median intensity of the channel in the corresponding cluster.
 
 If multiple files have been pooled together this table also contains columns in the form `Marker1@A.fcs`, which contain the median expression of `Marker1`, calculated only on the cells in that cluster that came from sample `A.fcs`
 
