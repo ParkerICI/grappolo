@@ -1,8 +1,4 @@
-**--> WARNING: This package is in Beta and under active development. Things may break or change without notice. Use it at your own risk and makre sure you have a backup copy of your data <--**
-
 Please use github issues to report bugs and for feature requests
-
-
 
 ## Installation
 
@@ -18,10 +14,10 @@ biocLite("flowCore")
 install.packages("devtools")
 ```
 
-3. install `scfeatures` with the following command
+3. install `grappolo` with the following command
 
 ```R
-devtools::install_github("ParkerICI/scfeatures")
+devtools::install_github("ParkerICI/grappolo")
 ```
 
 ## Usage

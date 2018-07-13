@@ -1,7 +1,7 @@
 #' @export
 
 clustering_GUI <- function(...) {
-    shiny::runApp(appDir = file.path(system.file(package = "scfeatures"), "shinyGUI"), ...)
+    shiny::runApp(appDir = file.path(system.file(package = "grappolo"), "shinyGUI"), ...)
 }
 
 get_fcs_col_names <- function(f.path) {

@@ -105,7 +105,7 @@ process_files_groups <- function(files, col.names, num.clusters, num.samples, as
         orig.data <- rbind(orig.data, temp.orig.data)
     }
 
-    m <- scfeatures:::cluster_data(tab, col.names, k = num.clusters, sampsize = min(nrow(tab), 1000), samples = num.samples)
+    m <- grappolo:::cluster_data(tab, col.names, k = num.clusters, sampsize = min(nrow(tab), 1000), samples = num.samples)
     colnames(m) <- gsub("groups", "cellType", colnames(m))
     orig.data <- cbind(orig.data, cellType = m[, "cellType"])
 
@@ -128,7 +128,7 @@ process_file <- function(f, col.names, num.clusters, num.samples, asinh.cofactor
     orig.data <- flowCore::exprs(fcs.file)
     tab <- convert_fcs(fcs.file, asinh.cofactor)
 
-    m <- scfeatures:::cluster_data(tab, col.names, k = num.clusters, sampsize = min(nrow(tab), 1000), samples = num.samples)
+    m <- grappolo:::cluster_data(tab, col.names, k = num.clusters, sampsize = min(nrow(tab), 1000), samples = num.samples)
     colnames(m) <- gsub("groups", "cellType", colnames(m))
     orig.data <- cbind(orig.data, cellType = m[, "cellType"])
 
