@@ -107,7 +107,7 @@ process_files_groups <- function(files, col.names, num.clusters, num.samples, as
 
     m <- grappolo:::cluster_data(tab, col.names, k = num.clusters, sampsize = min(nrow(tab), 1000), samples = num.samples)
     colnames(m) <- gsub("groups", "cellType", colnames(m))
-    orig.data <- cbind(orig.data, cellType = m[, "cellType"])
+    orig.data <- data.frame(orig.data, cellType = m[, "cellType"], check.names = FALSE, stringsAsFactors = FALSE)
 
     temp <- get_stats_by_sample(m)
 
@@ -130,7 +130,7 @@ process_file <- function(f, col.names, num.clusters, num.samples, asinh.cofactor
 
     m <- grappolo:::cluster_data(tab, col.names, k = num.clusters, sampsize = min(nrow(tab), 1000), samples = num.samples)
     colnames(m) <- gsub("groups", "cellType", colnames(m))
-    orig.data <- cbind(orig.data, cellType = m[, "cellType"])
+    orig.data <- data.frame(orig.data, cellType = m[, "cellType"], check.names = FALSE, stringsAsFactors = FALSE)
 
     tab.medians <- plyr::ddply(m, ~cellType, plyr::colwise(median))
 
