@@ -5,7 +5,7 @@
 \title{Calculate cluster features for model building}
 \usage{
 get_cluster_features(tab, metadata.tab, features.names, out.format = "table",
-  predictors = NULL, endpoint.grouping = NULL)
+  predictors = NULL, endpoint.grouping = NULL, filename.col = "file")
 }
 \arguments{
 \item{tab}{A \code{data.frame} representing clustering results, as produced by \code{cluster_data} (see Details)}
@@ -17,11 +17,13 @@ in \code{names(tab)}}
 
 \item{out.format}{The format of the return value, see below for detail}
 
-\item{predictors}{Only used if \code{out.format == "tidy"}. Columns in \code{metadata.tab} that identify predictors.}
+\item{predictors}{Only used if \code{out.format == "table"}. Columns in \code{metadata.tab} that identify predictors.}
 
-\item{endpoint.grouping}{Only used if \code{out.format == "tidy"}. Columns in \code{metadata.tab} that identify the grouping of the response variable
+\item{endpoint.grouping}{Only used if \code{out.format == "table"}. Columns in \code{metadata.tab} that identify the grouping of the response variable
 (see Details). The combination of \code{predictors} and \code{endpoint.grouping} must uniquely identify every row in \code{metadata.tab}.
 The function will throw an error if this is not the case.}
+
+\item{filename.col}{The name of the column in \code{metadata.tab} that is used to identify the file names in tab}
 }
 \value{
 Returns a data frame whose format depends on the value of the \code{format} parameter
@@ -35,11 +37,11 @@ Returns a data frame whose format depends on the value of the \code{format} para
 This function takes a clustering result and a table of sample metadata, and calculates cluster features to be used for model building
 }
 \details{
-This function is designed to work with the results of \code{cluster_data}. These results contain sample-level values for size of the clusters
-and channel intensities. A column such as \code{foo@sample1} identifies the \code{sample1}-specific value of variable \code{foo} for each cluster. The
-\code{metadata.tab} must contain a \code{file} column, which matches the names of the samples in \code{tab} (i.e. the part after the \code{@}, "sample1" in the
-above example). The rest of the columns in \code{metadata.tab} represent file-level metadata, which is used to identify the data corresponding to
-a given combination of predictors (see below)
+This function is designed to work with the results of \code{grappolo::cluster_fcs_files_groups}. These results contain sample-level values for size of the clusters
+and marker intensities. A column such as \code{foo@sample1} identifies the \code{sample1}-specific value of variable \code{foo} for each cluster. The
+\code{metadata.tab} must contain a column (identified by the \code{filename.col} function argument), which matches the names of the samples in
+\code{tab} (i.e. the part after the \code{@}, "sample1" in the above example). The rest of the columns in \code{metadata.tab} represent file-level
+metadata, which is used to identify the data corresponding to a given combination of predictors (see below)
 An example will help clarify the working of this function. Suppose you have collected data from multiple patients at multiple timepoints and under multiple
 stimulation conditions.
 In this case the \code{metadata.tab} would look like this

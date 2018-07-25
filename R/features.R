@@ -77,11 +77,11 @@ multistep_normalize <- function(tab, norm.template, subject.var) {
 #'
 #' This function takes a clustering result and a table of sample metadata, and calculates cluster features to be used for model building
 #'
-#' This function is designed to work with the results of \code{cluster_data}. These results contain sample-level values for size of the clusters
-#' and channel intensities. A column such as \code{foo@sample1} identifies the \code{sample1}-specific value of variable \code{foo} for each cluster. The
-#' \code{metadata.tab} must contain a \code{file} column, which matches the names of the samples in \code{tab} (i.e. the part after the \code{@}, "sample1" in the
-#' above example). The rest of the columns in \code{metadata.tab} represent file-level metadata, which is used to identify the data corresponding to
-#' a given combination of predictors (see below)
+#' This function is designed to work with the results of \code{grappolo::cluster_fcs_files_groups}. These results contain sample-level values for size of the clusters
+#' and marker intensities. A column such as \code{foo@sample1} identifies the \code{sample1}-specific value of variable \code{foo} for each cluster. The
+#' \code{metadata.tab} must contain a column (identified by the \code{filename.col} function argument), which matches the names of the samples in
+#' \code{tab} (i.e. the part after the \code{@}, "sample1" in the above example). The rest of the columns in \code{metadata.tab} represent file-level
+#' metadata, which is used to identify the data corresponding to a given combination of predictors (see below)
 #' An example will help clarify the working of this function. Suppose you have collected data from multiple patients at multiple timepoints and under multiple
 #' stimulation conditions.
 #' In this case the \code{metadata.tab} would look like this
@@ -106,11 +106,11 @@ multistep_normalize <- function(tab, norm.template, subject.var) {
 #' @param features.names The name of the features in \code{tab} that are to be included in the output. These names correspond to the portion before the \code{@}
 #'   in \code{names(tab)}
 #' @param out.format The format of the return value, see below for detail
-#' @param predictors Only used if \code{out.format == "tidy"}. Columns in \code{metadata.tab} that identify predictors.
-#' @param endpoint.grouping Only used if \code{out.format == "tidy"}. Columns in \code{metadata.tab} that identify the grouping of the response variable
+#' @param predictors Only used if \code{out.format == "table"}. Columns in \code{metadata.tab} that identify predictors.
+#' @param endpoint.grouping Only used if \code{out.format == "table"}. Columns in \code{metadata.tab} that identify the grouping of the response variable
 #'   (see Details). The combination of \code{predictors} and \code{endpoint.grouping} must uniquely identify every row in \code{metadata.tab}.
 #'   The function will throw an error if this is not the case.
-#'
+#' @param filename.col The name of the column in \code{metadata.tab} that is used to identify the file names in tab
 #' @return Returns a data frame whose format depends on the value of the \code{format} parameter
 #'   \itemize{
 #'     \item{table}: each row corresponds to a combination of the levels of the variables specified in \code{endpoint.grouping}, and the columns are
@@ -119,13 +119,13 @@ multistep_normalize <- function(tab, norm.template, subject.var) {
 #'   }
 #' @export
 
-get_cluster_features <- function(tab, metadata.tab, features.names, out.format = "table", predictors = NULL, endpoint.grouping = NULL) {
+get_cluster_features <- function(tab, metadata.tab, features.names, out.format = "table", predictors = NULL, endpoint.grouping = NULL, filename.col = "file") {
     out.format <- match.arg(out.format, c("table", "tidy"))
     m <- reshape_cluster_features(tab, features.names)
 
-    df <- reshape::melt(m, varnames = c("file", "variable"))
+    df <- reshape::melt(m, varnames = c(filename.col, "variable"))
 
-    df <- merge(df, metadata.tab, by = "file")
+    df <- merge(df, metadata.tab, by = filename.col)
     ret <- NULL
 
     if(out.format == "tidy")
@@ -160,6 +160,7 @@ run_test <- function() {
 transpose_feature_matrix <- function(m) {
     s <- strsplit(colnames(m), "@")
     v <- unique(sapply(s, "[", 1))
+    print(v)
     stopifnot(length(v) == 1)
 
     m <- t(m)
@@ -179,7 +180,7 @@ reshape_cluster_features <- function(input.tab, features) {
 
 
     ret <- lapply(features, function(s) {
-        temp <- m[, grep(s, colnames(m))]
+        temp <- m[, grep(sprintf("%s@", s), colnames(m))]
         temp[is.na(temp)] <- 0
 
         if(s == "popsize") {
