@@ -21,7 +21,7 @@ devtools::install_github("ParkerICI/grappolo")
 ```
 
 ## Usage
-This is an R package for clustering single-cell flow cytometry data and generate features to be used in mode building.
+This is an R package for clustering single-cell flow cytometry data and generate features to be used in mode building. The output of this clustering can be used to generate different types of visualizations using the [vite](https://github.com/ParkerICI/vite) package
 
 The following snippets provide an example usage, documentation for all functions can be accessed directly in R.
 
@@ -51,7 +51,7 @@ This is how a clustering run is setup, in case you wanted to cluster each file i
 col.names <- c("Marker1", "Marker2", "Marker3")
 
 # Please refer to the documentation of this function for an explanation of the parameters
-# and for a description of the output type. The output is saved on disk, and the function
+# and for a description of the output. The output is saved on disk, and the function
 # simply return the list of files that have been clustered
 cluster_fcs_files_in_dir("foo", num.cores = 1, col.names = col.names, num.clusters = 200,
     asinh.cofactor = 5)
@@ -84,12 +84,13 @@ Both clustering functions ouptut two types of data:
 - One or more RDS (R binary format) files containing cluster memberships for every cell event
 
 The summary table contains one row for each cluster, and one column for each channel in the original FCS files, with the table entries representing the median intensity of the channel in the corresponding cluster.
-
 If multiple files have been pooled together this table also contains columns in the form `Marker1@A.fcs`, which contain the median expression of `Marker1`, calculated only on the cells in that cluster that came from sample `A.fcs`
+
+The RDS files contain R data frames, where each row represents a different cell, and the columns the intensity of different markers. A special column called `cellType` indicates cluster membership
 
 ### Features generation
 
-This package also contains functions to rearrange the clustering output to calculate cluster features that can be used to build a predictive model (similar to the approach used in the Citrus package). These functions operate on the clusters summary table described above, and require data to have been pooled together before clustering (i.e. the clustering should have been run with the `cluster_fcs_files_groups` function). In other words, if you want to build a model that includes data from the four files in the example above, you need to cluster them as a single group.
+This package also contains functions to rearrange the clustering output to calculate cluster features that can be used to build a predictive model (similar to the approach used in the [Citrus](https://github.com/nolanlab/citrus) package). These functions operate on the clusters summary table described above, and require data to have been pooled together before clustering (i.e. the clustering should have been run with the `cluster_fcs_files_groups` function). In other words, if you want to build a model that includes data from the four files in the example above, you need to cluster them as a single group.
 
 The general approach for features generation for model building, is that you want to generate a table where each row represents a cluster feature (e.g. the abundance of a cluster, or the expression of a marker in a cluster), and each column represent an observation (e.g. a different sample), for which you have a categorical or continuous endpoint of interest that you want to predict using the cluster features.
 
@@ -129,18 +130,18 @@ Let's assume that you want to see if any of the data you have collected predicts
 - `endpoint.grouping`: subject
 
 In this case the feature matrix will have the following format:
-- rows: cluster x feature x timepoint x condition. So assuming a total of 200 clusters and 3 features per cluster (abundance, expression of Marker1, and expression of Marker2), there will be 200 * 3 * 2 * 3 rows in the matrix, corresponding to all the possible combinations of clusters, features, timepoints and conditions
-- columns: subject. There will then be 2 columns in the matrix corresponding to the two subjects
+- columns: cluster x feature x timepoint x condition. So assuming a total of 200 clusters and 3 features per cluster (abundance, expression of Marker1, and expression of Marker2), there will be 200 * 3 * 2 * 3 columns in the matrix, corresponding to all the possible combinations of clusters, features, timepoints and conditions
+- rows: subject. There will be 2 rows in the matrix corresponding to the two subjects
 
-#### Example model 1
+#### Example model 2
 
 Let's assume that you want to see if any of the data predicts the *tumor_size* variable, which is a *subject* x *timepoint*-level feature (i.e. there is a *tumor_size* measurement for each combination of *subject* and *timepoint*). In this case you would call `get_cluster_features` with the following parameters:
 - `predictors`: condition
 - `endpoint.grouping`: subject, timepoint
 
 In this case the feature matrix would have the following format:
-- rows: cluster x feature x condition, so 200 * 3 * 3 rows
-- columns: subject, timepoint, so 2 * 3 columns
+- columns: cluster x feature x condition, so 200 * 3 * 3 columns
+- rows: subject, timepoint, so 2 * 3 rows
 
 
 ---
