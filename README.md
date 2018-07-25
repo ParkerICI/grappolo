@@ -74,7 +74,7 @@ files.groups <- list(
 )
 
 cluster_fcs_files_groups(files.groups, num.cores = 1, col.names = col.names, 
-    num.clusters = 200, asinh.cofactor = 5, output.type = "directory")
+    num.clusters = 200, asinh.cofactor = 5)
 ```
 
 ## Output
