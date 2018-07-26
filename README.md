@@ -77,7 +77,20 @@ cluster_fcs_files_groups(files.groups, num.cores = 1, col.names = col.names,
     num.clusters = 200, asinh.cofactor = 5)
 ```
 
-## Output
+#### Using the GUI
+
+A GUI is available to launch a clustering run. The GUI allows you to specify all the input options in a graphical environment, instead of having to write R code.
+
+To launch the GUI type the following in your R console
+
+```R
+grappolo::clustering_GUI()
+```
+
+When the GUI starts you will be prompted to select a working directory. This directory must contain all the files that you want to include in the analysis. Select any file in that directory, and the directory that contains the file will be selected as working directory.
+
+
+#### Output
 
 Both clustering functions ouptut two types of data:
 - A summary table of per-cluster statistics
