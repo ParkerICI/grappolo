@@ -20,7 +20,7 @@ cluster_fcs_files(files.list, num.cores, col.names, num.clusters,
 
 \item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
 
-\item{output.dir}{The directory in which all the output files (and directories) will be created}
+\item{output.dir}{The name of the output directory, it will be created if it does not exist}
 }
 \value{
 Returns either \code{NULL} or a \code{try-error} object if some error occurred during the computation

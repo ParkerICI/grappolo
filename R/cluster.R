@@ -201,10 +201,13 @@ cluster_fcs_files_in_dir <- function(wd, ...) {
 #' @param num.clusters The desired number of clusters
 #' @param asinh.cofactor Cofactor for asinh transformation. If this is \code{NULL} no transformation is performed (see \code{convert_fcs})
 #' @param num.samples Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})
-#' @param output.dir The directory in which all the output files (and directories) will be created
+#' @param output.dir The name of the output directory, it will be created if it does not exist
 #' @return Returns either \code{NULL} or a \code{try-error} object if some error occurred during the computation
 #' @export
 cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, asinh.cofactor, num.samples = 50, output.dir = ".") {
+    if(!dir.exists(output.dir))
+        dir.create(output.dir, recursive = TRUE, showWarnings = TRUE)
+
     parallel::mclapply(files.list, mc.cores = num.cores, mc.preschedule = FALSE,
                        process_file, col.names = col.names, num.clusters = num.clusters,
                        num.samples = num.samples, asinh.cofactor = asinh.cofactor, output.dir = output.dir)
@@ -217,7 +220,7 @@ cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, as
 #' @param files.list A named list of vectors detailing how the files should be pooled before clustering. Files in the same vector will
 #'   be pooled together. The name of the output is going to correspond to the name of the corresponding list element.
 #' @param downsample.to The number of events that should be randomly sampled from each file before pooling. If this is 0, no sampling is performed
-#' @param output.dir The name of the output directory
+#' @param output.dir The name of the output directory, it will be created if it does not exist
 #' @inheritParams cluster_fcs_files
 #'
 #' @return Returns either \code{NULL} or a \code{try-error} object if some error occurred during the computation
@@ -229,6 +232,9 @@ cluster_fcs_files_groups <- function(files.list, num.cores, col.names, num.clust
     files.list <- lapply(names(files.list), function(x) {
         c(x, files.list[[x]])
     })
+
+    if(!dir.exists(output.dir))
+        dir.create(output.dir, recursive = TRUE, showWarnings = TRUE)
 
     parallel::mclapply(files.list, mc.cores = num.cores, mc.preschedule = FALSE,
                        process_files_groups, col.names = col.names, num.clusters = num.clusters, num.samples = num.samples,

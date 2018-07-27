@@ -16,7 +16,7 @@ cluster_fcs_files_in_dir(wd, ...)
   \item{num.clusters}{The desired number of clusters}
   \item{asinh.cofactor}{Cofactor for asinh transformation. If this is \code{NULL} no transformation is performed (see \code{convert_fcs})}
   \item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
-  \item{output.dir}{The directory in which all the output files (and directories) will be created}
+  \item{output.dir}{The name of the output directory, it will be created if it does not exist}
 }}
 }
 \value{

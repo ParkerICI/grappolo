@@ -18,7 +18,7 @@ process_file(f, col.names, num.clusters, num.samples, asinh.cofactor,
 
 \item{asinh.cofactor}{Cofactor for asinh transformation. If this is \code{NULL} no transformation is performed (see \code{convert_fcs})}
 
-\item{output.dir}{The directory in which all the output files (and directories) will be created}
+\item{output.dir}{The name of the output directory, it will be created if it does not exist}
 }
 \description{
 Process an individual file for clustering

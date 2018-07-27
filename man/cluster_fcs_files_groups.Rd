@@ -23,7 +23,7 @@ be pooled together. The name of the output is going to correspond to the name of
 
 \item{downsample.to}{The number of events that should be randomly sampled from each file before pooling. If this is 0, no sampling is performed}
 
-\item{output.dir}{The name of the output directory}
+\item{output.dir}{The name of the output directory, it will be created if it does not exist}
 }
 \value{
 Returns either \code{NULL} or a \code{try-error} object if some error occurred during the computation

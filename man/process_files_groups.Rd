@@ -21,7 +21,7 @@ the remaining strings are the paths of the files that will be pooled together fo
 
 \item{downsample.to}{The number of events that should be randomly sampled from each file before pooling. If this is 0, no sampling is performed}
 
-\item{output.dir}{The name of the output directory}
+\item{output.dir}{The name of the output directory, it will be created if it does not exist}
 }
 \description{
 Process a group of files for clustering
