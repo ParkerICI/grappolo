@@ -4,8 +4,9 @@
 \alias{get_cluster_features}
 \title{Calculate cluster features for model building}
 \usage{
-get_cluster_features(tab, metadata.tab, features.names, out.format = "table",
-  predictors = NULL, endpoint.grouping = NULL, filename.col = "file")
+get_cluster_features(tab, metadata.tab, features.names,
+  out.format = "table", predictors = NULL, endpoint.grouping = NULL,
+  filename.col = "file")
 }
 \arguments{
 \item{tab}{A \code{data.frame} representing clustering results, as produced by \code{cluster_data} (see Details)}

@@ -4,7 +4,8 @@
 \alias{convert_fcs}
 \title{Convert a flowFrame to data.frame}
 \usage{
-convert_fcs(f, asinh.cofactor = NULL, clip.at.zero = T, compensate = T)
+convert_fcs(f, asinh.cofactor = NULL, clip.at.zero = T,
+  compensate = T)
 }
 \arguments{
 \item{f}{The \code{flowFrame} to convert}
