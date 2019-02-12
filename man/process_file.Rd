@@ -5,7 +5,7 @@
 \title{Process an individual file for clustering}
 \usage{
 process_file(f, col.names, num.clusters, num.samples, asinh.cofactor,
-  output.dir)
+  output.dir, negative.values)
 }
 \arguments{
 \item{f}{The file path}
@@ -16,9 +16,18 @@ process_file(f, col.names, num.clusters, num.samples, asinh.cofactor,
 
 \item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
 
-\item{asinh.cofactor}{Cofactor for asinh transformation. If this is \code{NULL} no transformation is performed (see \code{convert_fcs})}
+\item{asinh.cofactor}{Cofactor for \code{asinh} transformation. If this is \code{NULL} no transformation is performed}
 
 \item{output.dir}{The name of the output directory, it will be created if it does not exist}
+
+\item{negative.values}{How to deal with negative values in the data. If this is \code{NULL} negative values
+are left as is. Otherwise two options are possible:
+\itemize{
+  \item{\code{truncate}}: Negative values will be truncated (i.e. replaced with 0)
+  \item{\code{shift}}: The data will be shifted so that only 5 percent of the values for each channel will
+    be truncated to 0. This option is useful in cases where the range of data significantly extends
+    in the negatives, for instance due to compensation.
+}}
 }
 \description{
 Process an individual file for clustering

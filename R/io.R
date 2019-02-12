@@ -8,14 +8,21 @@
 #'
 #' @param f The \code{flowFrame} to convert
 #' @param asinh.cofactor Cofactor for \code{asinh} transformation. If this is \code{NULL} no transformation is performed
-#' @param clip.at.zero Wether to clip negative values (after transformation) at zero
+#' @param negative.values How to deal with negative values in the data. If this is \code{NULL} negative values
+#'   are left as is. Otherwise two options are possible:
+#'   \itemize{
+#'     \item{\code{truncate}}: Negative values will be truncated (i.e. replaced with 0)
+#'     \item{\code{shift}}: The data will be shifted so that only 5 percent of the values for each channel will
+#'       be truncated to 0. This option is useful in cases where the range of data significantly extends
+#'       in the negatives, for instance due to compensation.
+#'   }
 #' @param compensate Wether to compensate the data using the compensation matrix embedded in the \code{flowFrame} (if any)
 #'
 #' @return Returns a \code{data.frame} corresponding to the data in \code{flowCore::exprs(f)} after compensation
 #'   and transformation
 #'
 #' @export
-convert_fcs <- function(f, asinh.cofactor = NULL, clip.at.zero = T, compensate = T) {
+convert_fcs <- function(f, asinh.cofactor = NULL, negative.values = "truncate", compensate = T) {
     comp <- grep("SPILL", names(flowCore::description(f)), value = T)
 
     if(compensate && (length(comp) > 0)) {
@@ -35,8 +42,13 @@ convert_fcs <- function(f, asinh.cofactor = NULL, clip.at.zero = T, compensate =
     if(!is.null(asinh.cofactor))
         m <- asinh(m / asinh.cofactor)
 
-    if(clip.at.zero)
-        m[m < 0] <- 0
+    if(!is.null(negative.values)) {
+        negative.values <- match.arg(negative.values, choices = c("truncate", "shift"))
+        if(negative.values == "truncate")
+            m[m < 0] <- 0
+        else if(negative.values == "shift")
+            m <- shift_negative_values(m)
+    }
 
     tab <- data.frame(m, check.names = F, stringsAsFactors = F)
 
@@ -49,6 +61,35 @@ convert_fcs <- function(f, asinh.cofactor = NULL, clip.at.zero = T, compensate =
 
     return(tab)
 }
+
+
+#' Shift negative values in a matrix
+#'
+#' This function shifts negative values in a data matrix. For each column vector
+#' the procedure is as follows:
+#' \enumerate{
+#'   \item A specific quantile is calculated from the vector
+#'   \item If the quantile is negative then its absolute value is added to the vector
+#'   \item Values that are still negative are truncated at 0
+#' }
+#'
+#' @param m The data matrix
+#' @param quantile.prob The quantile probability to use
+#' @return Return the transformed data matrix
+#'
+shift_negative_values <- function(m, quantile.prob = 0.05) {
+    apply(m, 2, function(x) {
+        qq <- quantile(x, quantile.prob)
+        ret <- NULL
+        if(qq < 0)
+            ret <- x + abs(qq)
+        else
+            ret <- x
+        ret[ret < 0] <- 0
+        return(ret)
+    })
+}
+
 
 
 #' Get the columns that are common to a set of input tabular files

@@ -14,9 +14,17 @@ cluster_fcs_files_in_dir(wd, ...)
   \item{num.cores}{Number of CPU cores to use}
   \item{col.names}{A vector of column names indicating which columns should be used for clustering}
   \item{num.clusters}{The desired number of clusters}
-  \item{asinh.cofactor}{Cofactor for asinh transformation. If this is \code{NULL} no transformation is performed (see \code{convert_fcs})}
   \item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
   \item{output.dir}{The name of the output directory, it will be created if it does not exist}
+  \item{asinh.cofactor}{Cofactor for \code{asinh} transformation. If this is \code{NULL} no transformation is performed}
+  \item{negative.values}{How to deal with negative values in the data. If this is \code{NULL} negative values
+are left as is. Otherwise two options are possible:
+\itemize{
+  \item{\code{truncate}}: Negative values will be truncated (i.e. replaced with 0)
+  \item{\code{shift}}: The data will be shifted so that only 5 percent of the values for each channel will
+    be truncated to 0. This option is useful in cases where the range of data significantly extends
+    in the negatives, for instance due to compensation.
+}}
 }}
 }
 \value{
