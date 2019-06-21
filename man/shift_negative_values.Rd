@@ -4,7 +4,7 @@
 \alias{shift_negative_values}
 \title{Shift negative values in a matrix}
 \usage{
-shift_negative_values(m, quantile.prob = 0.05)
+shift_negative_values(m, quantile.prob)
 }
 \arguments{
 \item{m}{The data matrix}

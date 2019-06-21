@@ -8,21 +8,22 @@
 #'
 #' @param f The \code{flowFrame} to convert
 #' @param asinh.cofactor Cofactor for \code{asinh} transformation. If this is \code{NULL} no transformation is performed
+#' @param compensate Wether to compensate the data using the compensation matrix embedded in the \code{flowFrame} (if any)
 #' @param negative.values How to deal with negative values in the data. If this is \code{NULL} negative values
 #'   are left as is. Otherwise two options are possible:
 #'   \itemize{
 #'     \item{\code{truncate}}: Negative values will be truncated (i.e. replaced with 0)
-#'     \item{\code{shift}}: The data will be shifted so that only 5 percent of the values for each channel will
+#'     \item{\code{shift}}: The data will be shifted so that only \code{quantile.prob} of the values for each channel will
 #'       be truncated to 0. This option is useful in cases where the range of data significantly extends
 #'       in the negatives, for instance due to compensation.
 #'   }
-#' @param compensate Wether to compensate the data using the compensation matrix embedded in the \code{flowFrame} (if any)
-#'
+#' @param quantile.prob Only used if \code{negative.value} is set to \code{shift}. The quantile of measurements
+#'   that are going to be truncated to 0. For instance if this is 0.05, the data will be shifted so that
+#'   only 5 percent of the values are negative and will be truncated to 0
 #' @return Returns a \code{data.frame} corresponding to the data in \code{flowCore::exprs(f)} after compensation
 #'   and transformation
-#'
 #' @export
-convert_fcs <- function(f, asinh.cofactor = NULL, negative.values = "truncate", compensate = T) {
+convert_fcs <- function(f, asinh.cofactor = NULL, compensate = T, negative.values = "truncate", quantile.prob = 0.05) {
     comp <- grep("SPILL", names(flowCore::description(f)), value = T)
 
     if(compensate && (length(comp) > 0)) {
@@ -47,7 +48,7 @@ convert_fcs <- function(f, asinh.cofactor = NULL, negative.values = "truncate", 
         if(negative.values == "truncate")
             m[m < 0] <- 0
         else if(negative.values == "shift")
-            m <- shift_negative_values(m)
+            m <- shift_negative_values(m, quantile.prob)
     }
 
     tab <- data.frame(m, check.names = F, stringsAsFactors = F)
@@ -77,7 +78,7 @@ convert_fcs <- function(f, asinh.cofactor = NULL, negative.values = "truncate", 
 #' @param quantile.prob The quantile probability to use
 #' @return Return the transformed data matrix
 #'
-shift_negative_values <- function(m, quantile.prob = 0.05) {
+shift_negative_values <- function(m, quantile.prob) {
     apply(m, 2, function(x) {
         qq <- quantile(x, quantile.prob)
         ret <- NULL

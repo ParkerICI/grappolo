@@ -86,10 +86,10 @@ multistep_normalize <- function(tab, norm.template, subject.var) {
 #' stimulation conditions.
 #' In this case the \code{metadata.tab} would look like this
 #' \itemize{
-#'   \item{\code{file}}{The names of the data files that contain data for each sample. These must match the names in the clustering results (see above)}
-#'   \item{\code{timepoint}}{The timepoint information}
-#'   \item{\code{condition}}{The stimulation condition}
-#'   \item{\code{subject}}{The subjet each file was derived from}
+#'   \item{\code{file}}{ The names of the data files that contain data for each sample. These must match the names in the clustering results (see above)}
+#'   \item{\code{timepoint}}{ The timepoint information}
+#'   \item{\code{condition}}{ The stimulation condition}
+#'   \item{\code{subject}}{ The subjet each file was derived from}
 #' }
 #' Let's assume a few different scenarios.
 #' \enumerate{
@@ -111,7 +111,7 @@ multistep_normalize <- function(tab, norm.template, subject.var) {
 #'   (see Details). The combination of \code{predictors} and \code{endpoint.grouping} must uniquely identify every row in \code{metadata.tab}.
 #'   The function will throw an error if this is not the case.
 #' @param filename.col The name of the column in \code{metadata.tab} that is used to identify the file names in tab
-#' @return Returns a data frame whose format depends on the value of the \code{format} parameter
+#' @return Returns a data frame whose format depends on the value of the \code{out.format} parameter
 #'   \itemize{
 #'     \item{table}: each row corresponds to a combination of the levels of the variables specified in \code{endpoint.grouping}, and the columns are
 #'     cluster features, which are combinations of the levels of the \code{predictors} for each feature specified in \code{features.names}
@@ -119,11 +119,15 @@ multistep_normalize <- function(tab, norm.template, subject.var) {
 #'   }
 #' @export
 
-get_cluster_features <- function(tab, metadata.tab, features.names, out.format = "table", predictors = NULL, endpoint.grouping = NULL, filename.col = "file") {
+get_cluster_features <- function(tab, metadata.tab, features.names, out.format = "table", predictors = NULL,
+                                 endpoint.grouping = NULL, filename.col = "file", transform.popsize = TRUE) {
     out.format <- match.arg(out.format, c("table", "tidy"))
-    m <- reshape_cluster_features(tab, features.names)
+    m <- reshape_cluster_features(tab, features.names, transform.popsize)
 
     df <- reshape::melt(m, varnames = c(filename.col, "variable"))
+
+    # Restore the original value of filename.col
+    names(df) <- gsub(make.names(filename.col), filename.col, names(df))
 
     df <- merge(df, metadata.tab, by = filename.col)
     ret <- NULL
@@ -143,7 +147,7 @@ get_cluster_features <- function(tab, metadata.tab, features.names, out.format =
         ret <- reshape::cast(df, formula.exp)
     }
 
-    return(ret)
+    return(data.frame(ret, check.names = FALSE, stringsAsFactors = FALSE))
 }
 
 
@@ -171,7 +175,7 @@ transpose_feature_matrix <- function(m) {
 }
 
 
-reshape_cluster_features <- function(input.tab, features) {
+reshape_cluster_features <- function(input.tab, features, transform.popsize = TRUE) {
     col.names <- sapply(features, paste, "@", sep = "")
     col.names <- paste(col.names, collapse = "|")
     col.names <- grep(col.names, names(input.tab), value = T)
@@ -183,7 +187,7 @@ reshape_cluster_features <- function(input.tab, features) {
         temp <- m[, grep(sprintf("%s@", s), colnames(m))]
         temp[is.na(temp)] <- 0
 
-        if(s == "popsize") {
+        if(s == "popsize" && transform.popsize) {
             temp <- t(temp)
             temp <- temp / rowSums(temp)
             temp <- t(temp)
