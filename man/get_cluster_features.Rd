@@ -6,7 +6,7 @@
 \usage{
 get_cluster_features(tab, metadata.tab, features.names,
   out.format = "table", predictors = NULL, endpoint.grouping = NULL,
-  filename.col = "file")
+  filename.col = "file", transform.popsize = TRUE)
 }
 \arguments{
 \item{tab}{A \code{data.frame} representing clustering results, as produced by \code{cluster_data} (see Details)}
@@ -27,7 +27,7 @@ The function will throw an error if this is not the case.}
 \item{filename.col}{The name of the column in \code{metadata.tab} that is used to identify the file names in tab}
 }
 \value{
-Returns a data frame whose format depends on the value of the \code{format} parameter
+Returns a data frame whose format depends on the value of the \code{out.format} parameter
   \itemize{
     \item{table}: each row corresponds to a combination of the levels of the variables specified in \code{endpoint.grouping}, and the columns are
     cluster features, which are combinations of the levels of the \code{predictors} for each feature specified in \code{features.names}
@@ -47,10 +47,10 @@ An example will help clarify the working of this function. Suppose you have coll
 stimulation conditions.
 In this case the \code{metadata.tab} would look like this
 \itemize{
-  \item{\code{file}}{The names of the data files that contain data for each sample. These must match the names in the clustering results (see above)}
-  \item{\code{timepoint}}{The timepoint information}
-  \item{\code{condition}}{The stimulation condition}
-  \item{\code{subject}}{The subjet each file was derived from}
+  \item{\code{file}}{ The names of the data files that contain data for each sample. These must match the names in the clustering results (see above)}
+  \item{\code{timepoint}}{ The timepoint information}
+  \item{\code{condition}}{ The stimulation condition}
+  \item{\code{subject}}{ The subjet each file was derived from}
 }
 Let's assume a few different scenarios.
 \enumerate{

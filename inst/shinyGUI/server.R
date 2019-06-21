@@ -45,11 +45,15 @@ render_clustering_ui <- function(working.directory, ...) {renderUI({
         ),
         fluidRow(
             column(12,
-
                 numericInput("clusteringui_num_clusters", "Number of clusters", value = 200, min = 1, max = 2000),
                 numericInput("clusteringui_num_samples", "Number of samples (lower numbers lead to faster but less accurate results)", value = 50, min = 2),
                 numericInput("clusteringui_asinh_cofactor", "Cofactor for asinh transformation", value = 5),
                 numericInput("clusteringui_num_cores", "Number of CPU cores to use", value = 1),
+                selectInput("clusteringui_negative_values", "Negative vaues", choices = c("truncate", "shift")),
+                conditionalPanel(
+                    condition = "input.clusteringui_negative_values == 'shift'",
+                    numericInput("clusteringui_quantile_prob", "Quantile probability", value = 0.05, min = 0, max = 1, step = 0.01)
+                ),
                 actionButton("clusteringui_start", "Start clustering")
             )
         )
@@ -106,6 +110,8 @@ shinyServer(function(input, output, session) {
             num.samples <- force(input$clusteringui_num_samples)
             downsample.to <- force(input$clusteringui_downsample_to)
             output.dir <- force(working.directory)
+            negative.values <- force(input$clusteringui_negative_values)
+            quantile.prob <- force(input$clusteringui_quantile_prob)
 
             if(input$clusteringui_clustering_mode == "Pooled") {
                 input.files <- lapply(clusteringui_reactive_values$clustering_groups, function(s) {file.path(working.directory, s)})
@@ -116,6 +122,8 @@ shinyServer(function(input, output, session) {
                     asinh.cofactor = asinh.cofactor,
                     num.samples = num.samples,
                     downsample.to = downsample.to,
+                    negative.values = negative.values,
+                    quantile.prob = quantile.prob,
                     output.dir = output.dir
                 )
             } else {
@@ -125,7 +133,9 @@ shinyServer(function(input, output, session) {
                     num.clusters = num.clusters,
                     asinh.cofactor = asinh.cofactor,
                     num.samples = num.samples,
-                    output.dir = output.dir
+                    output.dir = output.dir,
+                    negative.values = negative.values,
+                    quantile.prob = quantile.prob
                 )
             }
 

@@ -5,7 +5,8 @@
 \title{Cluster FCS files}
 \usage{
 cluster_fcs_files(files.list, num.cores, col.names, num.clusters,
-  asinh.cofactor, num.samples = 50, output.dir = ".")
+  asinh.cofactor, num.samples = 50, output.dir = ".",
+  negative.values = "truncate", quantile.prob = 0.05)
 }
 \arguments{
 \item{files.list}{The files to cluster}
@@ -16,11 +17,24 @@ cluster_fcs_files(files.list, num.cores, col.names, num.clusters,
 
 \item{num.clusters}{The desired number of clusters}
 
-\item{asinh.cofactor}{Cofactor for asinh transformation. If this is \code{NULL} no transformation is performed (see \code{convert_fcs})}
+\item{asinh.cofactor}{Cofactor for \code{asinh} transformation. If this is \code{NULL} no transformation is performed}
 
 \item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
 
 \item{output.dir}{The name of the output directory, it will be created if it does not exist}
+
+\item{negative.values}{How to deal with negative values in the data. If this is \code{NULL} negative values
+are left as is. Otherwise two options are possible:
+\itemize{
+  \item{\code{truncate}}: Negative values will be truncated (i.e. replaced with 0)
+  \item{\code{shift}}: The data will be shifted so that only \code{quantile.prob} of the values for each channel will
+    be truncated to 0. This option is useful in cases where the range of data significantly extends
+    in the negatives, for instance due to compensation.
+}}
+
+\item{quantile.prob}{Only used if \code{negative.value} is set to \code{shift}. The quantile of measurements
+that are going to be truncated to 0. For instance if this is 0.05, the data will be shifted so that
+only 5 percent of the values are negative and will be truncated to 0}
 }
 \value{
 Returns either \code{NULL} or a \code{try-error} object if some error occurred during the computation

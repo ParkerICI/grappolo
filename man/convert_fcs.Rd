@@ -4,17 +4,28 @@
 \alias{convert_fcs}
 \title{Convert a flowFrame to data.frame}
 \usage{
-convert_fcs(f, asinh.cofactor = NULL, clip.at.zero = T,
-  compensate = T)
+convert_fcs(f, asinh.cofactor = NULL, compensate = T,
+  negative.values = "truncate", quantile.prob = 0.05)
 }
 \arguments{
 \item{f}{The \code{flowFrame} to convert}
 
 \item{asinh.cofactor}{Cofactor for \code{asinh} transformation. If this is \code{NULL} no transformation is performed}
 
-\item{clip.at.zero}{Wether to clip negative values (after transformation) at zero}
-
 \item{compensate}{Wether to compensate the data using the compensation matrix embedded in the \code{flowFrame} (if any)}
+
+\item{negative.values}{How to deal with negative values in the data. If this is \code{NULL} negative values
+are left as is. Otherwise two options are possible:
+\itemize{
+  \item{\code{truncate}}: Negative values will be truncated (i.e. replaced with 0)
+  \item{\code{shift}}: The data will be shifted so that only \code{quantile.prob} of the values for each channel will
+    be truncated to 0. This option is useful in cases where the range of data significantly extends
+    in the negatives, for instance due to compensation.
+}}
+
+\item{quantile.prob}{Only used if \code{negative.value} is set to \code{shift}. The quantile of measurements
+that are going to be truncated to 0. For instance if this is 0.05, the data will be shifted so that
+only 5 percent of the values are negative and will be truncated to 0}
 }
 \value{
 Returns a \code{data.frame} corresponding to the data in \code{flowCore::exprs(f)} after compensation

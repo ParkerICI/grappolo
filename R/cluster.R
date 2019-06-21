@@ -65,7 +65,8 @@ cluster_data <- function(tab, col.names, k, ...) {
 #' @inheritParams cluster_fcs_files
 #'
 #'
-process_files_groups <- function(files, col.names, num.clusters, num.samples, asinh.cofactor, downsample.to, output.dir) {
+process_files_groups <- function(files, col.names, num.clusters, num.samples, asinh.cofactor,
+                                 downsample.to, output.dir, negative.values, quantile.prob) {
     tab <- NULL
     orig.data <- NULL
 
@@ -81,7 +82,7 @@ process_files_groups <- function(files, col.names, num.clusters, num.samples, as
 
         fcs.file <- flowCore::read.FCS(f)
         temp.orig.data <- flowCore::exprs(fcs.file)
-        temp.tab <- convert_fcs(fcs.file, asinh.cofactor)
+        temp.tab <- convert_fcs(fcs.file, asinh.cofactor, negative.values = negative.values, quantile.prob = quantile.prob)
 
         if(downsample.to > 0) {
             x <- NULL
@@ -123,10 +124,10 @@ process_files_groups <- function(files, col.names, num.clusters, num.samples, as
 #' @param f The file path
 #' @inheritParams cluster_fcs_files
 #'
-process_file <- function(f, col.names, num.clusters, num.samples, asinh.cofactor, output.dir) {
+process_file <- function(f, col.names, num.clusters, num.samples, asinh.cofactor, output.dir, negative.values, quantile.prob) {
     fcs.file <- flowCore::read.FCS(f)
     orig.data <- flowCore::exprs(fcs.file)
-    tab <- convert_fcs(fcs.file, asinh.cofactor)
+    tab <- convert_fcs(fcs.file, asinh.cofactor, negative.values = negative.values, quantile.prob = quantile.prob)
 
     m <- grappolo:::cluster_data(tab, col.names, k = num.clusters, sampsize = min(nrow(tab), 1000), samples = num.samples)
     colnames(m) <- gsub("groups", "cellType", colnames(m))
@@ -199,18 +200,20 @@ cluster_fcs_files_in_dir <- function(wd, ...) {
 #' @param num.cores Number of CPU cores to use
 #' @param col.names A vector of column names indicating which columns should be used for clustering
 #' @param num.clusters The desired number of clusters
-#' @param asinh.cofactor Cofactor for asinh transformation. If this is \code{NULL} no transformation is performed (see \code{convert_fcs})
 #' @param num.samples Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})
 #' @param output.dir The name of the output directory, it will be created if it does not exist
+#' @inheritParams convert_fcs
 #' @return Returns either \code{NULL} or a \code{try-error} object if some error occurred during the computation
 #' @export
-cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, asinh.cofactor, num.samples = 50, output.dir = ".") {
+cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, asinh.cofactor,
+                              num.samples = 50, output.dir = ".", negative.values = "truncate", quantile.prob = 0.05) {
     if(!dir.exists(output.dir))
         dir.create(output.dir, recursive = TRUE, showWarnings = TRUE)
 
     parallel::mclapply(files.list, mc.cores = num.cores, mc.preschedule = FALSE,
                        process_file, col.names = col.names, num.clusters = num.clusters,
-                       num.samples = num.samples, asinh.cofactor = asinh.cofactor, output.dir = output.dir)
+                       num.samples = num.samples, asinh.cofactor = asinh.cofactor,
+                       output.dir = output.dir, negative.values = negative.values, quantile.prob = quantile.prob)
 }
 
 
@@ -227,7 +230,8 @@ cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, as
 #'
 #' @export
 cluster_fcs_files_groups <- function(files.list, num.cores, col.names, num.clusters, asinh.cofactor,
-                                        num.samples = 50, downsample.to = 0, output.dir = ".") {
+                                        num.samples = 50, downsample.to = 0, output.dir = ".", negative.values = "truncate",
+                                        quantile.prob = 0.05) {
 
     files.list <- lapply(names(files.list), function(x) {
         c(x, files.list[[x]])
@@ -238,7 +242,8 @@ cluster_fcs_files_groups <- function(files.list, num.cores, col.names, num.clust
 
     parallel::mclapply(files.list, mc.cores = num.cores, mc.preschedule = FALSE,
                        process_files_groups, col.names = col.names, num.clusters = num.clusters, num.samples = num.samples,
-                       asinh.cofactor = asinh.cofactor, downsample.to = downsample.to, output.dir = output.dir)
+                       asinh.cofactor = asinh.cofactor, downsample.to = downsample.to,
+                       output.dir = output.dir, negative.values = negative.values, quantile.prob = quantile.prob)
 
 }
 
