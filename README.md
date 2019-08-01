@@ -4,6 +4,10 @@ Please use github issues to report bugs and for feature requests
 
 1. install the `flowCore` package
 ```R
+# If using a version of R >= 3.6
+install.packages("BiocManager")
+BiocManager::install("flowCore")
+# else
 source("http://bioconductor.org/biocLite.R")
 biocLite("flowCore")
 ```
