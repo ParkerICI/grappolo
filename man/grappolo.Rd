@@ -3,8 +3,4 @@
 \docType{package}
 \name{grappolo}
 \alias{grappolo}
-\alias{grappolo-package}
 \title{grappolo: A package to cluster single-cell data and generate features that can be used for model building}
-\description{
-grappolo: A package to cluster single-cell data and generate features that can be used for model building
-}

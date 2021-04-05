@@ -4,9 +4,17 @@
 \alias{cluster_fcs_files}
 \title{Cluster FCS files}
 \usage{
-cluster_fcs_files(files.list, num.cores, col.names, num.clusters,
-  asinh.cofactor, num.samples = 50, output.dir = ".",
-  negative.values = "truncate", quantile.prob = 0.05)
+cluster_fcs_files(
+  files.list,
+  num.cores,
+  col.names,
+  num.clusters,
+  asinh.cofactor,
+  num.samples = 50,
+  output.dir = ".",
+  negative.values = "truncate",
+  quantile.prob = 0.05
+)
 }
 \arguments{
 \item{files.list}{The files to cluster}
