@@ -9,15 +9,16 @@ cluster_fcs_files_in_dir(wd, ...)
 \arguments{
 \item{wd}{The directory containing the FCS files}
 
-\item{...}{Arguments passed on to \code{cluster_fcs_files}
-\describe{
-  \item{num.cores}{Number of CPU cores to use}
-  \item{col.names}{A vector of column names indicating which columns should be used for clustering}
-  \item{num.clusters}{The desired number of clusters}
-  \item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
-  \item{output.dir}{The name of the output directory, it will be created if it does not exist}
-  \item{asinh.cofactor}{Cofactor for \code{asinh} transformation. If this is \code{NULL} no transformation is performed}
-  \item{negative.values}{How to deal with negative values in the data. If this is \code{NULL} negative values
+\item{...}{
+  Arguments passed on to \code{\link[=cluster_fcs_files]{cluster_fcs_files}}
+  \describe{
+    \item{\code{num.cores}}{Number of CPU cores to use}
+    \item{\code{col.names}}{A vector of column names indicating which columns should be used for clustering}
+    \item{\code{num.clusters}}{The desired number of clusters}
+    \item{\code{num.samples}}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
+    \item{\code{output.dir}}{The name of the output directory, it will be created if it does not exist}
+    \item{\code{asinh.cofactor}}{Cofactor for \code{asinh} transformation. If this is \code{NULL} no transformation is performed}
+    \item{\code{negative.values}}{How to deal with negative values in the data. If this is \code{NULL} negative values
 are left as is. Otherwise two options are possible:
 \itemize{
   \item{\code{truncate}}: Negative values will be truncated (i.e. replaced with 0)
@@ -25,10 +26,10 @@ are left as is. Otherwise two options are possible:
     be truncated to 0. This option is useful in cases where the range of data significantly extends
     in the negatives, for instance due to compensation.
 }}
-  \item{quantile.prob}{Only used if \code{negative.value} is set to \code{shift}. The quantile of measurements
+    \item{\code{quantile.prob}}{Only used if \code{negative.value} is set to \code{shift}. The quantile of measurements
 that are going to be truncated to 0. For instance if this is 0.05, the data will be shifted so that
 only 5 percent of the values are negative and will be truncated to 0}
-}}
+  }}
 }
 \value{
 Returns the list of files that have been clustered

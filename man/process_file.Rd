@@ -4,8 +4,16 @@
 \alias{process_file}
 \title{Process an individual file for clustering}
 \usage{
-process_file(f, col.names, num.clusters, num.samples, asinh.cofactor,
-  output.dir, negative.values, quantile.prob)
+process_file(
+  f,
+  col.names,
+  num.clusters,
+  num.samples,
+  asinh.cofactor,
+  output.dir,
+  negative.values,
+  quantile.prob
+)
 }
 \arguments{
 \item{f}{The file path}

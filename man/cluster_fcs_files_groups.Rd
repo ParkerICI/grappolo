@@ -4,10 +4,18 @@
 \alias{cluster_fcs_files_groups}
 \title{Pool FCS files and cluster them}
 \usage{
-cluster_fcs_files_groups(files.list, num.cores, col.names, num.clusters,
-  asinh.cofactor, num.samples = 50, downsample.to = 0,
-  output.dir = ".", negative.values = "truncate",
-  quantile.prob = 0.05)
+cluster_fcs_files_groups(
+  files.list,
+  num.cores,
+  col.names,
+  num.clusters,
+  asinh.cofactor,
+  num.samples = 50,
+  downsample.to = 0,
+  output.dir = ".",
+  negative.values = "truncate",
+  quantile.prob = 0.05
+)
 }
 \arguments{
 \item{files.list}{A named list of vectors detailing how the files should be pooled before clustering. Files in the same vector will

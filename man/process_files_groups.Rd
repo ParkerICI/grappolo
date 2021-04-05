@@ -4,9 +4,17 @@
 \alias{process_files_groups}
 \title{Process a group of files for clustering}
 \usage{
-process_files_groups(files, col.names, num.clusters, num.samples,
-  asinh.cofactor, downsample.to, output.dir, negative.values,
-  quantile.prob)
+process_files_groups(
+  files,
+  col.names,
+  num.clusters,
+  num.samples,
+  asinh.cofactor,
+  downsample.to,
+  output.dir,
+  negative.values,
+  quantile.prob
+)
 }
 \arguments{
 \item{files}{A vector of strings. The first string in the vector corresponds to the name to be used for the clustering output,

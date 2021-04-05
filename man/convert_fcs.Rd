@@ -4,8 +4,13 @@
 \alias{convert_fcs}
 \title{Convert a flowFrame to data.frame}
 \usage{
-convert_fcs(f, asinh.cofactor = NULL, compensate = T,
-  negative.values = "truncate", quantile.prob = 0.05)
+convert_fcs(
+  f,
+  asinh.cofactor = NULL,
+  compensate = T,
+  negative.values = "truncate",
+  quantile.prob = 0.05
+)
 }
 \arguments{
 \item{f}{The \code{flowFrame} to convert}
