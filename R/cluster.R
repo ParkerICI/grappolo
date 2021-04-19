@@ -43,12 +43,23 @@ get_stats_by_sample <- function(tab) {
 #'
 #' @return Returns \code{tab}, with an added column called \code{groups}, indicating cluster membership
 #'
-cluster_data <- function(tab, col.names, k, ...) {
-    m <- as.matrix(tab[, col.names])
+cluster_data <- function(tab, col.names, k, method = c("clara", "flowsom"), ...) {
+    method <- match.arg(method)
+
 
     message("Clustering started")
     flush.console()
-    groups <- cluster::clara(m, k, ...)$clustering
+    groups <- NULL
+
+    if(method == "clara") {
+        m <- as.matrix(tab[, col.names])
+        groups <- cluster::clara(m, k, ...)$clustering
+    }
+    else if(method == "flowsom") {
+        fsom.res <- run_flowsom(tab, col.names = col.names, scale = FALSE)
+        groups <- fsom.res$map$mapping[, 1]
+    }
+
     message("Clustering done")
     flush.console()
 
@@ -66,7 +77,8 @@ cluster_data <- function(tab, col.names, k, ...) {
 #'
 #'
 process_files_groups <- function(files, col.names, num.clusters, num.samples, asinh.cofactor,
-                                 downsample.to, output.dir, negative.values, quantile.prob) {
+                                 downsample.to, output.dir, negative.values, quantile.prob,
+                                 method = c("clara", "flowsom")) {
     tab <- NULL
     orig.data <- NULL
 
@@ -106,7 +118,7 @@ process_files_groups <- function(files, col.names, num.clusters, num.samples, as
         orig.data <- rbind(orig.data, temp.orig.data)
     }
 
-    m <- grappolo:::cluster_data(tab, col.names, k = num.clusters, sampsize = min(nrow(tab), 1000), samples = num.samples)
+    m <- grappolo:::cluster_data(tab, col.names, k = num.clusters, sampsize = min(nrow(tab), 1000), samples = num.samples, method = method)
     colnames(m) <- gsub("groups", "cellType", colnames(m))
     orig.data <- data.frame(orig.data, cellType = m[, "cellType"], check.names = FALSE, stringsAsFactors = FALSE)
 
@@ -124,12 +136,13 @@ process_files_groups <- function(files, col.names, num.clusters, num.samples, as
 #' @param f The file path
 #' @inheritParams cluster_fcs_files
 #'
-process_file <- function(f, col.names, num.clusters, num.samples, asinh.cofactor, output.dir, negative.values, quantile.prob) {
+process_file <- function(f, col.names, num.clusters, num.samples, asinh.cofactor, output.dir, 
+                            negative.values, quantile.prob, method = c("clara", "flowsom")) {
     fcs.file <- flowCore::read.FCS(f)
     orig.data <- flowCore::exprs(fcs.file)
     tab <- convert_fcs(fcs.file, asinh.cofactor, negative.values = negative.values, quantile.prob = quantile.prob)
 
-    m <- grappolo:::cluster_data(tab, col.names, k = num.clusters, sampsize = min(nrow(tab), 1000), samples = num.samples)
+    m <- grappolo:::cluster_data(tab, col.names, k = num.clusters, sampsize = min(nrow(tab), 1000), samples = num.samples, method = method)
     colnames(m) <- gsub("groups", "cellType", colnames(m))
     orig.data <- data.frame(orig.data, cellType = m[, "cellType"], check.names = FALSE, stringsAsFactors = FALSE)
 
@@ -200,20 +213,23 @@ cluster_fcs_files_in_dir <- function(wd, ...) {
 #' @param num.cores Number of CPU cores to use
 #' @param col.names A vector of column names indicating which columns should be used for clustering
 #' @param num.clusters The desired number of clusters
-#' @param num.samples Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})
+#' @param num.samples Number of samples to be used for the CLARA algorithm (see \code{cluster::clara}).
+#'   Only used if \code{method = "clara"}
+#' @param The method to be used for clustering
 #' @param output.dir The name of the output directory, it will be created if it does not exist
 #' @inheritParams convert_fcs
 #' @return Returns either \code{NULL} or a \code{try-error} object if some error occurred during the computation
 #' @export
 cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, asinh.cofactor,
-                              num.samples = 50, output.dir = ".", negative.values = "truncate", quantile.prob = 0.05) {
+                              num.samples = 50, output.dir = ".", negative.values = "truncate", quantile.prob = 0.05, 
+                              method = c("clara", "flowsom")) {
     if(!dir.exists(output.dir))
         dir.create(output.dir, recursive = TRUE, showWarnings = TRUE)
 
     parallel::mclapply(files.list, mc.cores = num.cores, mc.preschedule = FALSE,
                        process_file, col.names = col.names, num.clusters = num.clusters,
                        num.samples = num.samples, asinh.cofactor = asinh.cofactor,
-                       output.dir = output.dir, negative.values = negative.values, quantile.prob = quantile.prob)
+                       output.dir = output.dir, negative.values = negative.values, quantile.prob = quantile.prob, method = method)
 }
 
 
@@ -231,7 +247,7 @@ cluster_fcs_files <- function(files.list, num.cores, col.names, num.clusters, as
 #' @export
 cluster_fcs_files_groups <- function(files.list, num.cores, col.names, num.clusters, asinh.cofactor,
                                         num.samples = 50, downsample.to = 0, output.dir = ".", negative.values = "truncate",
-                                        quantile.prob = 0.05) {
+                                        quantile.prob = 0.05, method = c("clara", "flowsom")) {
 
     files.list <- lapply(names(files.list), function(x) {
         c(x, files.list[[x]])
@@ -243,7 +259,7 @@ cluster_fcs_files_groups <- function(files.list, num.cores, col.names, num.clust
     parallel::mclapply(files.list, mc.cores = num.cores, mc.preschedule = FALSE,
                        process_files_groups, col.names = col.names, num.clusters = num.clusters, num.samples = num.samples,
                        asinh.cofactor = asinh.cofactor, downsample.to = downsample.to,
-                       output.dir = output.dir, negative.values = negative.values, quantile.prob = quantile.prob)
+                       output.dir = output.dir, negative.values = negative.values, quantile.prob = quantile.prob, method = method)
 
 }
 

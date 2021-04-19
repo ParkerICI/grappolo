@@ -15,7 +15,8 @@ cluster_fcs_files_in_dir(wd, ...)
     \item{\code{num.cores}}{Number of CPU cores to use}
     \item{\code{col.names}}{A vector of column names indicating which columns should be used for clustering}
     \item{\code{num.clusters}}{The desired number of clusters}
-    \item{\code{num.samples}}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
+    \item{\code{num.samples}}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara}).
+Only used if \code{method = "clara"}}
     \item{\code{output.dir}}{The name of the output directory, it will be created if it does not exist}
     \item{\code{asinh.cofactor}}{Cofactor for \code{asinh} transformation. If this is \code{NULL} no transformation is performed}
     \item{\code{negative.values}}{How to deal with negative values in the data. If this is \code{NULL} negative values

@@ -14,7 +14,8 @@ cluster_fcs_files_groups(
   downsample.to = 0,
   output.dir = ".",
   negative.values = "truncate",
-  quantile.prob = 0.05
+  quantile.prob = 0.05,
+  method = c("clara", "flowsom")
 )
 }
 \arguments{
@@ -29,7 +30,8 @@ be pooled together. The name of the output is going to correspond to the name of
 
 \item{asinh.cofactor}{Cofactor for \code{asinh} transformation. If this is \code{NULL} no transformation is performed}
 
-\item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
+\item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara}).
+Only used if \code{method = "clara"}}
 
 \item{downsample.to}{The number of events that should be randomly sampled from each file before pooling. If this is 0, no sampling is performed}
 

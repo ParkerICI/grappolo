@@ -4,7 +4,7 @@
 \alias{cluster_data}
 \title{Clusters a table of data}
 \usage{
-cluster_data(tab, col.names, k, ...)
+cluster_data(tab, col.names, k, method = c("clara", "flowsom"), ...)
 }
 \arguments{
 \item{tab}{The input \code{data.frame}}

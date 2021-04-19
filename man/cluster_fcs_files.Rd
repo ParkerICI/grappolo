@@ -13,7 +13,8 @@ cluster_fcs_files(
   num.samples = 50,
   output.dir = ".",
   negative.values = "truncate",
-  quantile.prob = 0.05
+  quantile.prob = 0.05,
+  method = c("clara", "flowsom")
 )
 }
 \arguments{
@@ -27,7 +28,8 @@ cluster_fcs_files(
 
 \item{asinh.cofactor}{Cofactor for \code{asinh} transformation. If this is \code{NULL} no transformation is performed}
 
-\item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
+\item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara}).
+Only used if \code{method = "clara"}}
 
 \item{output.dir}{The name of the output directory, it will be created if it does not exist}
 
@@ -43,6 +45,8 @@ are left as is. Otherwise two options are possible:
 \item{quantile.prob}{Only used if \code{negative.value} is set to \code{shift}. The quantile of measurements
 that are going to be truncated to 0. For instance if this is 0.05, the data will be shifted so that
 only 5 percent of the values are negative and will be truncated to 0}
+
+\item{The}{method to be used for clustering}
 }
 \value{
 Returns either \code{NULL} or a \code{try-error} object if some error occurred during the computation

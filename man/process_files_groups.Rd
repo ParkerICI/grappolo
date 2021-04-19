@@ -13,7 +13,8 @@ process_files_groups(
   downsample.to,
   output.dir,
   negative.values,
-  quantile.prob
+  quantile.prob,
+  method = c("clara", "flowsom")
 )
 }
 \arguments{
@@ -24,7 +25,8 @@ the remaining strings are the paths of the files that will be pooled together fo
 
 \item{num.clusters}{The desired number of clusters}
 
-\item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara})}
+\item{num.samples}{Number of samples to be used for the CLARA algorithm (see \code{cluster::clara}).
+Only used if \code{method = "clara"}}
 
 \item{asinh.cofactor}{Cofactor for \code{asinh} transformation. If this is \code{NULL} no transformation is performed}
 
