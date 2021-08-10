@@ -38,7 +38,7 @@ run_flowsom <- function(tab, col.names, scale = FALSE) {
         toTransform = NULL,
         transformFunction = NULL,
         scale = FALSE,
-        prettyColnames = colnames(m),
+        prettyColnames = setNames(colnames(m), colnames(m)),
         scaled.center = NULL,
         scaled.scale = NULL
     )
@@ -50,7 +50,7 @@ run_flowsom <- function(tab, col.names, scale = FALSE) {
         fsom$scaled.scale <- attr(fsom$data, "scaled:scale")
         attr(fsom$data, "scaled:scale") <- NULL
     }
-
+    class(fsom) <- "FlowSOM"
     ret <- FlowSOM::BuildSOM(fsom, colsToUse = 1:ncol(m))
     return(ret)
 }
